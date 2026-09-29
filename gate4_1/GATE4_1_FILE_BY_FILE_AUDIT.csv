@@ -218,6 +218,9 @@ gate4/evidence/g4-typecheck-final.log,.log,695,a19f7635522c283ee9fa4bd687921ec38
 gate4/evidence/g4-verification.log,.log,1829,045fda029e846d50e36ae363988bc34cd99ee8421f0a37de4c0bcc2c1bb5de7f,gate4-reports,Platform,Gate4,Evidence,Gate 4 report/evidence,-,-,-,info,support/historical
 gate4/schema-snapshot-g4.sha256,.sha256,65,2cd29e17a48a2bb2a8c3f39d3e7f306843dbc170c160ab50eb338607057e5e90,gate4-reports,Platform,Gate4,Historical,Gate 4 report/evidence,-,-,-,info,support/historical
 gate4/schema-snapshot-g4.sql,.sql,289699,40bd5ee4ca9ff3e71c17389883c6c9bad7b0c35ba2b627a80740e2819299fe62,gate4-reports,Platform,Gate4,Historical,Gate 4 report/evidence,-,-,-,info,support/historical
+gate4_1/GATE4_1_ARTIFACT_CONSISTENCY.md,.md,1622,4bbf165526838361d8461c35e9a412342569d1e2e36282fe85bf88f6375016e2,gate41,Platform,Gate4.1,Authoritative,Gate 4.1 deliverable/evidence,-,-,-,info,support/historical
+gate4_1/GATE4_1_FILE_BY_FILE_AUDIT.csv,.csv,320528,4f413b2a0767c961d686c1f64ee22d8cfe77d920ba4575e93a2f913dcc0b9fb2,gate41,Platform,Gate4.1,Authoritative,Gate 4.1 deliverable/evidence,-,-,-,info,support/historical
+gate4_1/GATE4_1_FILE_BY_FILE_AUDIT.md,.md,312980,4ed68569ad16766c37d31b72b7c8268a5d76a29868509417e5dfdc4c816550ed,gate41,Platform,Gate4.1,Authoritative,Gate 4.1 deliverable/evidence,-,-,-,info,support/historical
 gate4_1/evidence/PHASE_A_REPO_INVENTORY.txt,.txt,2337,7e77bd7f4e42d00e94553caca5ceb0c749d1bf4ccb969de0e0f6ae7340f93434,gate41,Platform,Gate4.1,Evidence,Gate 4.1 deliverable/evidence,-,-,-,info,support/historical
 gate4_1/evidence/schema-snapshot-g41.sql,.sql,289699,bdcd5586217a6df678c45c3abed9ed05585eba19a3fc81d64b4cd5a5492627b4,gate41,Platform,Gate4.1,Evidence,Gate 4.1 deliverable/evidence,-,-,-,info,support/historical
 karen-home-gate4-final.tar.gz,.gz,698746,de9cfe9a42bf1769e6bd249dc74330eecace192b8c45c59e346eb8d01520934c,bundles,Platform,pre-Gate0(reference),Historical,Self-contained artifact bundle,-,-,-,info,support/historical
