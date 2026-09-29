@@ -1,0 +1,25 @@
+{
+  "name": "enterprise-real-estate-platform",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "build": "pnpm --filter @platform/db build && pnpm --filter @platform/contracts build && pnpm --filter @platform/api build && pnpm --filter @platform/worker build",
+    "typecheck": "pnpm --filter @platform/db typecheck && pnpm --filter @platform/contracts typecheck && pnpm --filter @platform/api typecheck && pnpm --filter @platform/worker typecheck",
+    "test": "pnpm --filter @platform/db test && pnpm --filter @platform/api test",
+    "test:integration": "pnpm --filter @platform/api test:integration",
+    "api:dev": "pnpm --filter @platform/api dev",
+    "worker:dev": "pnpm --filter @platform/worker dev",
+    "lint": "eslint \"packages/db/src/**/*.ts\" \"packages/contracts/src/**/*.ts\" \"apps/api/src/**/*.ts\" \"apps/api/test/**/*.ts\" \"apps/worker/src/**/*.ts\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.71.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "fastify": "5.12.5"
+    }
+  }
+}
