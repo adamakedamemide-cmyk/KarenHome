@@ -2,6 +2,11 @@
 
 Updated: 2026-09-30 · Authoritative repository: `https://github.com/adamakedamemide-cmyk/KarenHome.git` branch `main`
 
+## Master Execution Contract
+
+- **Current Master Execution Contract = Master Execution Prompt v1.3** (archived at `docs/reference/master-prompt/karen_home_zai_master_execution_prompt_v1_3.md`, manifest + SHA-256 in `docs/reference/master-prompt/MANIFEST.md`, SHA-256 `1ea8899f24b05d01da3c56a8f83954a2fc0592a5c4c344dea4a08c95a62953c5`).
+- Contract mandates: ≥36 agent groups × ≥5 specialists, stage-by-stage gates (no big-bang), `NO PUSH = NO COMPLETED ACTION`, honest status separation (`Documented / Implemented / Tested / Verified / Live Verified / Production Ready`), Gate 6 remains closed until Gate 5.1 core-domain closure passes.
+
 ## Current state
 
 - **Authoritative repository**: `https://github.com/adamakedamemide-cmyk/KarenHome.git` branch `main`
