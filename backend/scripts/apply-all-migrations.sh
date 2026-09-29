@@ -34,7 +34,9 @@ echo "=== Karen Home — full migration chain on fresh DB: $DB_NAME ==="
 
 # 0. ledger infrastructure (additive, documented in G3 report)
 psql_target() {
-  if [ -n "${DATABASE_URL:-}" ]; then "${PSQL[@]}"; else "${PSQL[@]}" -d "$DB_NAME"; fi
+  # GATE5-S: forward ALL arguments (-f file / -c sql) — a previous version
+  # silently dropped them, turning the whole URL-path apply into a no-op.
+  if [ -n "${DATABASE_URL:-}" ]; then "${PSQL[@]}" "$@"; else "${PSQL[@]}" -d "$DB_NAME" "$@"; fi
 }
 
 psql_target << 'SQL'
