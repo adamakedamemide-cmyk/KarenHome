@@ -1,0 +1,36 @@
+=== [SAST-01 eval usage] pattern: eval\(|new Function\(
+  (no hits)
+=== [SAST-02 child_process] pattern: child_process|execSync|spawnSync
+  (no hits)
+=== [SAST-03 SQL concat] pattern: \$\{[a-zA-Z_]+\}(SELECT|INSERT|UPDATE|DELETE|WHERE)
+  (no hits)
+=== [SAST-04 weak crypto] pattern: md5|sha1|des-ecb|createCipher\(
+backend/apps/api/src/common/auth/totp.ts:33:  const digest = createHmac('sha1', key).update(buffer).digest();
+backend/apps/api/test/g4-mfa-antibot.spec.ts:12:  const digest = createHmac('sha1', key).update(buffer).digest();
+=== [SAST-05 hardcoded secret] pattern: (password|secret|api_?key)\s*[:=]\s*['"][A-Za-z0-9+/]{16,}['"]
+  (no hits)
+=== [SAST-06 unsafe html] pattern: innerHTML|document\.write|dangerouslyAllow
+  (no hits)
+=== [SEC-01 private keys] pattern: BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY
+  (no hits)
+=== [SEC-02 github tokens] pattern: gh[pousr]_[A-Za-z0-9]{30,}
+  (no hits)
+=== [SEC-03 aws keys] pattern: AKIA[0-9A-Z]{16}
+  (no hits)
+=== [SEC-04 jwt raw] pattern: eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.
+  (no hits)
+=== [SEC-05 db passwords] pattern: POSTGRES_PASSWORD
+.github/workflows/ci.yml:20:          POSTGRES_PASSWORD: ci-placeholder-password
+=== [SEC-06 cred env defaults] pattern: (TWILIO_AUTH_TOKEN|OAUTH_GOOGLE_CLIENT_SECRET|OAUTH_FACEBOOK_CLIENT_SECRET)=.{6,}
+  (no hits)
+=== [FS-01 debug flags] pattern: debug:\s*true
+  (no hits)
+=== [FS-02 cors wildcard] pattern: origin:\s*['"]\*['"]
+  (no hits)
+=== [FS-03 dockerfile issues] pattern: FROM .*:latest|curl \| (ba)?sh
+  (no hits)
+=== [IAC-01 privileged] pattern: privileged:\s*true
+  (no hits)
+=== [FS-04 http endpoints] pattern: http://[a-z0-9.-]+\.(com|net|org|io|local)
+  (no hits)
+=== SCAN COMPLETE 2026-09-29T17:31:07Z ===
