@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@fastify/multipart": "9.3.0",
-    "@fastify/static": "8.3.0",
+    "@fastify/static": "10.1.2",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.0",
@@ -25,10 +25,10 @@
     "fastify": "^5.0.0",
     "ioredis": "5.8.2",
     "jose": "^6.1.0",
-    "nodemailer": "7.0.10",
+    "nodemailer": "10.0.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
-    "sharp": "0.34.4"
+    "sharp": "0.35.4"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.29.7",
@@ -36,7 +36,7 @@
     "@nestjs/cli": "^11.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.0.0",
-    "@types/nodemailer": "7.0.4",
+    "@types/nodemailer": "^8.0.2",
     "jest": "^30.0.0",
     "ts-jest": "^29.4.5",
     "typescript": "^5.8.0"

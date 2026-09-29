@@ -17,7 +17,6 @@ function startMockClamd(opts: { verdict: 'ok' | 'found' | 'silent' }): Promise<{
     const server = createServer((socket: Socket) => {
       let buffer = Buffer.alloc(0);
       const chunks: Buffer[] = [];
-      let totalLength = 0;
       let sawTerminator = false;
       socket.on('data', (data: Buffer) => {
         buffer = Buffer.concat([buffer, data]);
@@ -40,7 +39,6 @@ function startMockClamd(opts: { verdict: 'ok' | 'found' | 'silent' }): Promise<{
           }
           if (payload.length - offset < frameLength) break;
           chunks.push(payload.subarray(offset, offset + frameLength));
-          totalLength += frameLength;
           offset += frameLength;
         }
         buffer = payload.subarray(offset);
