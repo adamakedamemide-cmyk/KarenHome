@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { randomBytes, createHash, randomInt } from 'node:crypto';
+import { randomBytes, createHash, createHmac, randomInt, timingSafeEqual } from 'node:crypto';
 import * as argon2 from 'argon2';
 import { DomainError } from '@platform/contracts';
 import { AuditRepository, IamHardeningRepository, IamRepository, JobRepository, type IamUser } from '@platform/db';
@@ -226,16 +226,23 @@ export class IamHardeningService {
     return this.oauthRegistry.configuredNames();
   }
 
-  async oauthAuthorizeUrl(providerName: string, redirectUri: string): Promise<{ authorizationUrl: string }> {
+  async oauthAuthorizeUrl(providerName: string, redirectUri: string): Promise<{ authorizationUrl: string; state: string }> {
     const provider = this.oauthRegistry.get(providerName);
     if (!provider) throw new DomainError('OAUTH_PROVIDER_NOT_CONFIGURED', 'error.oauth_not_configured');
-    const state = randomBytes(16).toString('hex');
-    return { authorizationUrl: provider.authorizationUrl(state, redirectUri) };
+    // GATE5-G fix: the state is now HMAC-signed with an expiry and MUST be
+    // presented back at the callback. Gate 4 generated a state but never
+    // verified it (registered finding G5-F-03): the callback accepted any
+    // code without CSRF protection. Signed + expiring state defeats login CSRF
+    // (an attacker cannot mint a valid state) without server-side session
+    // affinity; session-binding can be layered on at the gateway later.
+    const state = this.issueOAuthState();
+    return { authorizationUrl: provider.authorizationUrl(state, redirectUri), state };
   }
 
-  async oauthCallback(providerName: string, code: string, redirectUri: string, meta: { deviceId?: string; ip?: string; userAgent?: string; requestId?: string }): Promise<AuthTokens> {
+  async oauthCallback(providerName: string, code: string, state: string, redirectUri: string, meta: { deviceId?: string; ip?: string; userAgent?: string; requestId?: string }): Promise<AuthTokens> {
     const provider = this.oauthRegistry.get(providerName);
     if (!provider) throw new DomainError('OAUTH_PROVIDER_NOT_CONFIGURED', 'error.oauth_not_configured');
+    if (!this.verifyOAuthState(state)) throw new DomainError('OAUTH_STATE_INVALID', 'error.oauth_state_invalid');
     const profile: OAuthProviderProfile = await provider.exchangeCode(code, redirectUri);
     const linked = await this.hardening.findOAuthIdentity(providerName, profile.providerUserId);
     if (linked) return this.issueTokensForActiveUser(linked.userId, meta);
@@ -254,6 +261,30 @@ export class IamHardeningService {
     await this.hardening.linkOAuthIdentity({ userId: user.id, provider: providerName, providerUserId: profile.providerUserId, providerEmail: profile.email ?? undefined });
     await this.audit.append({ actorUserId: user.id, action: 'iam.oauth_linked', entityType: 'iam.user', entityId: user.id });
     return this.issueTokensForActiveUser(user.id, meta);
+  }
+
+  private static readonly OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
+
+  /** GATE5-G: signed, expiring OAuth state (HMAC-SHA256 over nonce+expiry). */
+  private issueOAuthState(): string {
+    const nonce = randomBytes(16).toString('base64url');
+    const expiresAt = Date.now() + IamHardeningService.OAUTH_STATE_TTL_MS;
+    const mac = createHmac('sha256', this.config.jwtSecret).update(`${nonce}.${expiresAt}`).digest('base64url');
+    return `${nonce}.${expiresAt}.${mac}`;
+  }
+
+  private verifyOAuthState(state: string | undefined): boolean {
+    if (!state) return false;
+    const parts = state.split('.');
+    if (parts.length !== 3) return false;
+    const [nonce, expiry, mac] = parts as [string, string, string];
+    if (!nonce || !expiry || !mac) return false;
+    const expiresAt = Number(expiry);
+    if (!Number.isSafeInteger(expiresAt) || expiresAt < Date.now()) return false;
+    const expected = createHmac('sha256', this.config.jwtSecret).update(`${nonce}.${expiry}`).digest('base64url');
+    const macBuffer = Buffer.from(mac);
+    const expectedBuffer = Buffer.from(expected);
+    return macBuffer.length === expectedBuffer.length && timingSafeEqual(macBuffer, expectedBuffer);
   }
 
   /** Shared token issuance for hardened flows (MFA / OAuth). */

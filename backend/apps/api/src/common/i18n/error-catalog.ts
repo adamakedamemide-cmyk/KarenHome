@@ -35,6 +35,7 @@ export const ERROR_MESSAGE_CATALOG: ErrorCatalog = {
   MEDIA_TOO_LARGE: { en: 'The uploaded file exceeds the size limit.', ru: 'Загруженный файл превышает допустимый размер.' },
   MEDIA_UNSUPPORTED_TYPE: { en: 'The file type is not supported.', ru: 'Тип файла не поддерживается.' },
   OAUTH_PROVIDER_NOT_CONFIGURED: { en: 'The OAuth provider is not configured.', ru: 'Поставщик OAuth не настроен.' },
+  OAUTH_STATE_INVALID: { en: 'The OAuth state parameter is missing, invalid, or expired.', ru: 'Параметр состояния OAuth отсутствует, недействителен или истёк.' },
   CHALLENGE_REQUIRED: { en: 'An additional verification challenge is required.', ru: 'Требуется дополнительная проверка.' },
   TEMPORARILY_BLOCKED: { en: 'You are temporarily blocked. Try again later.', ru: 'Вы временно заблокированы. Попробуйте позже.' },
   DISPOSABLE_EMAIL_REJECTED: { en: 'Disposable email addresses are not allowed.', ru: 'Одноразовые адреса электронной почты запрещены.' },

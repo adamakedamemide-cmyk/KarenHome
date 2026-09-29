@@ -1,4 +1,5 @@
 import { OutboxRepository, SearchIndexRepository, type JobRecord } from '@platform/db';
+import { OS_LISTINGS_INDEX, OS_LISTINGS_INDEX_DEFINITION, toOsListingDoc } from '@platform/contracts';
 import type { WorkerContext } from '../runner';
 
 /**
@@ -82,6 +83,12 @@ export async function handleOutboxJob(_job: JobRecord, ctx: WorkerContext): Prom
  * job queue; RebuildSearchIndex is a chunked scan job. OpenSearch push happens
  * when OPENSEARCH_URL is configured AND reachable; the PG FTS doc store is
  * always authoritative (verified engine).
+ *
+ * GATE5-C fix: an OpenSearch push failure now FAILS the job (retryable with
+ * backoff, DLQ after max_attempts) instead of being swallowed. The PG doc was
+ * already marked indexed before the push attempt, so business correctness is
+ * preserved while the OpenSearch update remains retryable — per the Gate 5
+ * mandatory failure scenario.
  */
 export async function handleSearchJob(job: JobRecord, ctx: WorkerContext): Promise<void> {
   const indexState = new SearchIndexRepository(ctx.db);
@@ -95,16 +102,16 @@ export async function handleSearchJob(job: JobRecord, ctx: WorkerContext): Promi
       return;
     }
     await indexState.markIndexed(payload.listingId, doc);
-    await pushToOpenSearch(doc).catch((error) => {
-      ctx.log('opensearch_push_failed', { listingId: payload.listingId, error: error instanceof Error ? error.message : 'unknown' });
-      // PG store stays authoritative; OpenSearch lag is observable via logs/metrics.
-    });
+    await pushToOpenSearch(doc, ctx);
     return;
   }
 
   if (job.jobType === 'search.delete') {
     if (!payload.listingId) throw new Error('VALIDATION: listingId required');
     await indexState.removePending(payload.listingId);
+    // GATE5-C fix: the OpenSearch copy must be deleted too — Gate 4 only
+    // cleared the PG index state, leaving a stale OS document searchable.
+    await deleteFromOpenSearch(payload.listingId, ctx);
     return;
   }
 
@@ -128,15 +135,56 @@ export async function handleSearchJob(job: JobRecord, ctx: WorkerContext): Promi
   throw new Error(`UNKNOWN_SEARCH_JOB: ${job.jobType}`);
 }
 
-async function pushToOpenSearch(doc: Record<string, unknown>): Promise<void> {
+async function deleteFromOpenSearch(listingId: string, ctx: WorkerContext): Promise<void> {
   const baseUrl = process.env.OPENSEARCH_URL ?? '';
   if (!baseUrl) return;
-  const listingId = String(doc.listingId ?? '');
-  if (!listingId) return;
-  const response = await fetch(`${baseUrl}/listings-v1/_doc/${listingId}`, {
-    method: 'PUT',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ ...doc, location_point: doc.locationPointWkt ?? undefined }),
-  });
-  if (!response.ok) throw new Error(`OPENSEARCH_${response.status}`);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5_000);
+  try {
+    const response = await fetch(`${baseUrl}/${OS_LISTINGS_INDEX}/_doc/${listingId}`, { method: 'DELETE', signal: controller.signal });
+    // 404 is fine (already gone / never indexed); anything else is a retryable failure.
+    if (!response.ok && response.status !== 404) throw new Error(`OPENSEARCH_${response.status}`);
+  } catch (error) {
+    ctx.log('opensearch_delete_failed', { listingId, error: error instanceof Error ? error.message : 'unknown' });
+    throw error instanceof Error ? error : new Error('OPENSEARCH_DELETE_FAILED');
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function pushToOpenSearch(doc: Record<string, unknown>, ctx: WorkerContext): Promise<void> {
+  const baseUrl = process.env.OPENSEARCH_URL ?? '';
+  if (!baseUrl) return;
+  const source = toOsListingDoc(doc);
+  if (!source) return;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5_000);
+  try {
+    // Idempotent index bootstrap (GATE5-C): creation + strict mapping once.
+    const head = await fetch(`${baseUrl}/${OS_LISTINGS_INDEX}`, { method: 'HEAD', signal: controller.signal });
+    if (!head.ok) {
+      const created = await fetch(`${baseUrl}/${OS_LISTINGS_INDEX}`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(OS_LISTINGS_INDEX_DEFINITION),
+        signal: controller.signal,
+      });
+      if (!created.ok) throw new Error(`OPENSEARCH_${created.status}: index bootstrap failed`);
+    }
+    const response = await fetch(`${baseUrl}/${OS_LISTINGS_INDEX}/_doc/${source.listing_id}?refresh=false`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(source),
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new Error(`OPENSEARCH_${response.status}`);
+  } catch (error) {
+    ctx.log('opensearch_push_failed', { listingId: source.listing_id, error: error instanceof Error ? error.message : 'unknown' });
+    // Rethrow → job fails → retried with backoff → DLQ after max attempts.
+    // PG store remains authoritative and correct; the OpenSearch update stays
+    // retryable (Gate 5 mandatory failure scenario).
+    throw new Error(`OPENSEARCH_PUSH_FAILED: ${error instanceof Error ? error.message : 'unknown'}`);
+  } finally {
+    clearTimeout(timer);
+  }
 }

@@ -115,7 +115,7 @@ export class IamHardeningController {
   @HttpCode(HttpStatus.OK)
   async oauthCallback(@Param('provider') provider: string, @Body() dto: OAuthCallbackDto, @Req() request: FastifyRequest) {
     const redirectUri = `${this.hardening.configRedirectBase}/${provider}/callback`;
-    return { data: await this.hardening.oauthCallback(provider, dto.code, redirectUri, requestMeta(request)) };
+    return { data: await this.hardening.oauthCallback(provider, dto.code, dto.state, redirectUri, requestMeta(request)) };
   }
 }
 

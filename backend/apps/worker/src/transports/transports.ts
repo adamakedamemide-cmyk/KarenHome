@@ -98,14 +98,21 @@ export class TwilioSmsTransport implements SmsTransport {
 
   async send(message: SmsMessage): Promise<{ providerReference: string }> {
     const auth = Buffer.from(`${this.accountSid}:${this.authToken}`).toString('base64');
-    const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${this.accountSid}/Messages.json`, {
-      method: 'POST',
-      headers: { authorization: `Basic ${auth}`, 'content-type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ To: message.to, From: this.fromNumber, Body: message.body }),
-    });
-    if (!response.ok) throw new Error(`TWILIO_${response.status}`);
-    const body = (await response.json()) as { sid?: string };
-    return { providerReference: body.sid ?? `twilio:${message.dedupKey}` };
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10_000); // GATE5-F: bounded provider call
+    try {
+      const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${this.accountSid}/Messages.json`, {
+        method: 'POST',
+        headers: { authorization: `Basic ${auth}`, 'content-type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ To: message.to, From: this.fromNumber, Body: message.body }),
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`TWILIO_${response.status}`);
+      const body = (await response.json()) as { sid?: string };
+      return { providerReference: body.sid ?? `twilio:${message.dedupKey}` };
+    } finally {
+      clearTimeout(timer);
+    }
   }
 }
 

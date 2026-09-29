@@ -3,6 +3,7 @@ import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import sharp from 'sharp';
 import { MediaRepository, type JobRecord, type MediaScanStatus } from '@platform/db';
+import { ClamavInstreamScanner } from '../transports/clamav';
 import type { WorkerContext } from '../runner';
 
 const VARIANT_WIDTHS = [1920, 1280, 768, 320] as const;
@@ -18,7 +19,7 @@ const MAX_HAMMING = 6;
  * deterministic object keys (sha256-named) and upserts variants.
  */
 
-/** Signature-based scan (verified). ClamAV hook point is provider-shaped. */
+/** Signature-based scan (verified). Always applied as the cheap first pass. */
 function scanBuffer(buffer: Buffer): { status: 'clean' | 'infected' | 'skipped'; provider: string; reason?: string } {
   const eicar = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';
   if (buffer.subarray(0, 256).toString('binary').includes(eicar.slice(0, 60))) {
@@ -29,6 +30,29 @@ function scanBuffer(buffer: Buffer): { status: 'clean' | 'infected' | 'skipped';
     return { status: 'infected', provider: 'signature-v1', reason: 'embedded_script' };
   }
   return { status: 'clean', provider: 'signature-v1' };
+}
+
+/**
+ * GATE5-E: optional real ClamAV daemon scan (CLAMD_HOST/CLAMD_PORT).
+ * Fail-closed on daemon error: the job throws → retried with backoff → DLQ.
+ * Without CLAMD_HOST the verified signature-v1 scan remains the provider and
+ * the daemon path stays UNVERIFIED_EXTERNAL (never claimed Production Verified).
+ */
+async function securityScan(buffer: Buffer): Promise<{ status: 'clean' | 'infected' | 'skipped'; provider: string; reason?: string }> {
+  const local = scanBuffer(buffer);
+  if (local.status === 'infected') return local;
+  const host = process.env.CLAMD_HOST ?? '';
+  if (!host) return local;
+  const scanner = new ClamavInstreamScanner(host, Number(process.env.CLAMD_PORT ?? '3310'), 10_000);
+  const result = await scanner.scan(buffer);
+  if (result.status === 'error') {
+    throw new Error(`CLAMAV_SCAN_ERROR: ${result.reason ?? 'unreachable'} (fail-closed)`);
+  }
+  if (result.status === 'infected') {
+    const reason = result.signature ?? result.reason ?? 'clamav_infected';
+    return { status: 'infected', provider: result.provider, reason };
+  }
+  return { status: 'clean', provider: result.provider };
 }
 
 export async function handleMediaJob(job: JobRecord, ctx: WorkerContext): Promise<void> {
@@ -46,8 +70,8 @@ export async function handleMediaJob(job: JobRecord, ctx: WorkerContext): Promis
     await repo.markProcessing(asset.id);
     const original = await readFile(tmpPath);
 
-    // Security scan.
-    const scan = scanBuffer(original);
+    // Security scan (signature pre-pass + optional real clamd daemon, GATE5-E).
+    const scan = await securityScan(original);
     if (scan.status === 'infected') {
       await repo.quarantine(asset.id, scan.reason ?? 'scan_failed');
       ctx.log('media_quarantined', { assetId: asset.id, reason: scan.reason });

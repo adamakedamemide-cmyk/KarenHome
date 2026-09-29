@@ -38,12 +38,14 @@ export class GoogleOAuthProvider implements OAuthProvider {
       method: 'POST',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({ code, client_id: this.clientId, client_secret: this.clientSecret, redirect_uri: redirectUri, grant_type: 'authorization_code' }),
+      signal: AbortSignal.timeout(10_000), // GATE5-G: bounded provider call
     });
     if (!tokenResponse.ok) throw new DomainError('UNAUTHORIZED', 'oauth.token_exchange_failed', { status: 502 });
     const tokenBody = (await tokenResponse.json()) as { access_token?: string };
     if (!tokenBody.access_token) throw new DomainError('UNAUTHORIZED', 'oauth.token_missing', { status: 502 });
     const profileResponse = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
       headers: { authorization: `Bearer ${tokenBody.access_token}` },
+      signal: AbortSignal.timeout(10_000), // GATE5-G: bounded provider call
     });
     if (!profileResponse.ok) throw new DomainError('UNAUTHORIZED', 'oauth.profile_failed', { status: 502 });
     const profile = (await profileResponse.json()) as { sub?: string; email?: string; name?: string };
@@ -73,14 +75,14 @@ export class FacebookOAuthProvider implements OAuthProvider {
     tokenUrl.searchParams.set('client_id', this.clientId);
     tokenUrl.searchParams.set('client_secret', this.clientSecret);
     tokenUrl.searchParams.set('redirect_uri', redirectUri);
-    const tokenResponse = await fetch(tokenUrl);
+    const tokenResponse = await fetch(tokenUrl, { signal: AbortSignal.timeout(10_000) }); // GATE5-G: bounded provider call
     if (!tokenResponse.ok) throw new DomainError('UNAUTHORIZED', 'oauth.token_exchange_failed', { status: 502 });
     const tokenBody = (await tokenResponse.json()) as { access_token?: string };
     if (!tokenBody.access_token) throw new DomainError('UNAUTHORIZED', 'oauth.token_missing', { status: 502 });
     const profileUrl = new URL('https://graph.facebook.com/me');
     profileUrl.searchParams.set('fields', 'id,name,email');
     profileUrl.searchParams.set('access_token', tokenBody.access_token);
-    const profileResponse = await fetch(profileUrl);
+    const profileResponse = await fetch(profileUrl, { signal: AbortSignal.timeout(10_000) }); // GATE5-G: bounded provider call
     if (!profileResponse.ok) throw new DomainError('UNAUTHORIZED', 'oauth.profile_failed', { status: 502 });
     const profile = (await profileResponse.json()) as { id?: string; name?: string; email?: string };
     if (!profile.id) throw new DomainError('UNAUTHORIZED', 'oauth.profile_incomplete', { status: 502 });

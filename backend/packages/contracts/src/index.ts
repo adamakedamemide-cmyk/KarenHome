@@ -1,4 +1,5 @@
 export * from './errors';
+export * from './search-os-doc';
 
 export const API_VERSION = 'v1' as const;
 

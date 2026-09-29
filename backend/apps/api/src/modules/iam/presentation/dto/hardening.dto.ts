@@ -38,4 +38,6 @@ export class MfaLoginDto {
 
 export class OAuthCallbackDto {
   @IsString() @MinLength(1) @MaxLength(2048) code!: string;
+  /** GATE5-G: signed state issued by /authorize — now mandatory (CSRF). */
+  @IsString() @MinLength(1) @MaxLength(1024) state!: string;
 }

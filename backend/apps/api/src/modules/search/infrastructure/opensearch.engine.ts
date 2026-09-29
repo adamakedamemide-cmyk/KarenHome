@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { OS_LISTINGS_INDEX, OS_LISTINGS_INDEX_DEFINITION, toOsListingDoc } from '@platform/contracts';
 import type { SearchEngine, SearchQuery, SearchResult, SearchHit, SearchFacets } from '../domain/search-engine.port';
 
-const INDEX_NAME = 'listings-v1';
+const INDEX_NAME = OS_LISTINGS_INDEX;
 const REQUEST_TIMEOUT_MS = 5_000;
 
 /**
@@ -13,6 +14,7 @@ const REQUEST_TIMEOUT_MS = 5_000;
 @Injectable()
 export class OpenSearchEngine implements SearchEngine {
   readonly name = 'opensearch';
+  private indexEnsured = false;
 
   constructor(private readonly baseUrl: string) {}
 
@@ -92,11 +94,21 @@ export class OpenSearchEngine implements SearchEngine {
     return { hits, total: response.hits.total.value, facets, engine: this.name };
   }
 
+  /** GATE5-C: idempotent index bootstrap (creation + mapping + analyzer). */
+  async ensureIndex(): Promise<void> {
+    if (this.indexEnsured) return;
+    const response = await this.rawRequest('HEAD', `/${INDEX_NAME}`);
+    if (!response.ok) {
+      await this.request(`/${INDEX_NAME}`, 'PUT', OS_LISTINGS_INDEX_DEFINITION);
+    }
+    this.indexEnsured = true;
+  }
+
   async indexDoc(doc: Record<string, unknown>): Promise<void> {
-    const listingId = String(doc.listingId ?? '');
-    if (!listingId) throw new Error('OPENSEARCH_INDEX_DOC_MISSING_ID');
-    const source = { ...doc, location_point: doc.locationPointWkt ? doc.locationPointWkt : undefined };
-    await this.request(`/${INDEX_NAME}/_doc/${listingId}?refresh=false`, 'PUT', source);
+    await this.ensureIndex();
+    const source = toOsListingDoc(doc);
+    if (!source) throw new Error('OPENSEARCH_INDEX_DOC_MISSING_ID');
+    await this.request(`/${INDEX_NAME}/_doc/${source.listing_id}?refresh=false`, 'PUT', source);
   }
 
   async deleteDoc(listingId: string): Promise<void> {
@@ -118,24 +130,28 @@ export class OpenSearchEngine implements SearchEngine {
     }
   }
 
-  private async request<T>(path: string, method: 'POST' | 'PUT' | 'DELETE', body?: unknown, timeoutMs: number = REQUEST_TIMEOUT_MS): Promise<T> {
+  private async rawRequest(method: 'HEAD' | 'POST' | 'PUT' | 'DELETE', path: string, body?: unknown, timeoutMs: number = REQUEST_TIMEOUT_MS): Promise<Response> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const response = await fetch(`${this.baseUrl}${path}`, {
+      return await fetch(`${this.baseUrl}${path}`, {
         method,
         headers: { 'content-type': 'application/json' },
         ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
         signal: controller.signal,
       });
-      if (!response.ok) {
-        const text = await response.text().catch(() => '');
-        throw new Error(`OPENSEARCH_${response.status}: ${text.slice(0, 300)}`);
-      }
-      if (method === 'DELETE') return {} as T;
-      return (await response.json()) as T;
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  private async request<T>(path: string, method: 'POST' | 'PUT' | 'DELETE', body?: unknown, timeoutMs: number = REQUEST_TIMEOUT_MS): Promise<T> {
+    const response = await this.rawRequest(method, path, body, timeoutMs);
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      throw new Error(`OPENSEARCH_${response.status}: ${text.slice(0, 300)}`);
+    }
+    if (method === 'DELETE') return {} as T;
+    return (await response.json()) as T;
   }
 }
