@@ -1,0 +1,37 @@
+=====================================================================
+GATE 4.1 — PHASE A: REPOSITORY RECOVERY & FULL INVENTORY
+Executed: 2026-09-29 | Executor: Main Agent (per user mandate GATE 4.1)
+=====================================================================
+Repository URL .......... https://github.com/adamakedamemide-cmyk/KarenHome.git
+Branch .................. main (only branch; remotes/origin/HEAD -> origin/main)
+HEAD at clone ........... e27a546dbe52657666d978db9443b0f8156d7477
+Tags (GitHub repo) ...... NONE — see note T-1
+Working tree ............ clean at clone (nothing to commit, working tree clean)
+Tracked files ........... 838
+Untracked files ......... 0
+Ignored files ........... 0 (no .gitignore at repo root yet)
+Submodules .............. none (.gitmodules absent)
+Git LFS ................. not used
+GitHub Actions .......... none at clone (no .github/ directory) — CI added in PHASE P
+Repository size ......... 14 MB (excl. .git)
+Top-level entries ....... Karen_Home_Project_Artifacts_CURRENT_v1.zip,
+                          karen-home-gate4-final.tar.gz, PROJECT_STATE_SUMMARY.md,
+                          README.md, gate4/, w0/, project-artifact-export/
+
+git log --oneline --decorate --graph -30:
+* e27a546 (HEAD -> main, origin/main, origin/HEAD) PROJECT ARTIFACT EXPORT — Karen Home CURRENT v1 (self-contained audit snapshot)
+(single-commit repo; history starts at the artifact-export delivery)
+
+git status: clean. git tag: (empty). git branch -a: main, remotes/origin/main.
+
+NOTE T-1 (honest registration): The LOCAL execution workspace (/home/z/my-project)
+holds an unrelated git history ending at 7616cca with tags gate3-db-final and
+gate4-final pointing at commits df45d69/4fdb484. That raw history was intentionally
+NOT pushed to GitHub because one tracked file (w0-work/backend/docker-compose.postgres.yml,
+POSTGRES_PASSWORD: postgres) violates the no-secrets rule. The authoritative GitHub
+repo therefore starts from the redacted export snapshot e27a546. Tag lineage of the
+raw history is preserved in project-artifact-export/00_manifest/GIT_STATE.txt.
+Going forward all tags are created directly on the GitHub repo.
+
+DRIFT CHECK: git diff 4fdb484..HEAD -- w0-work/ (local workspace) = EMPTY
+=> backend source has zero drift since the gate4-final commit that Gate 4 reports describe.
