@@ -15,21 +15,29 @@ set -euo pipefail
 
 DB_NAME="${1:?usage: apply-all-migrations.sh <database-name>}"
 DB_DIR="$(cd "$(dirname "$0")/../database" && pwd)"
-PSQL="psql -U postgres -v ON_ERROR_STOP=1 -q"
+# GATE5-S: in CI (and any TCP-only deployment) DATABASE_URL is the connection
+# target; the local default remains the unix socket as user postgres.
+if [ -n "${DATABASE_URL:-}" ]; then
+  PSQL=(psql -v ON_ERROR_STOP=1 -q "$DATABASE_URL")
+else
+  PSQL=(psql -U postgres -v ON_ERROR_STOP=1 -q)
+fi
 
 run_file() {
   local step="$1" file="$2"
   echo "── applying: $step"
-  $PSQL -d "$DB_NAME" -f "$file"
-  $PSQL -d "$DB_NAME" -c \
-    "INSERT INTO platform.schema_migrations(step, filename, applied_at) VALUES ('$step', '$(basename "$file")', now())
-     ON CONFLICT (step) DO NOTHING;" > /dev/null
+  psql_target -f "$file"
+  psql_target -c "INSERT INTO platform.schema_migrations(step, filename, applied_at) VALUES ('$step', '$(basename "$file")', now()) ON CONFLICT (step) DO NOTHING;" > /dev/null
 }
 
 echo "=== Karen Home — full migration chain on fresh DB: $DB_NAME ==="
 
 # 0. ledger infrastructure (additive, documented in G3 report)
-$PSQL -d "$DB_NAME" << 'SQL'
+psql_target() {
+  if [ -n "${DATABASE_URL:-}" ]; then "${PSQL[@]}"; else "${PSQL[@]}" -d "$DB_NAME"; fi
+}
+
+psql_target << 'SQL'
 BEGIN;
 CREATE SCHEMA IF NOT EXISTS platform;
 CREATE TABLE IF NOT EXISTS platform.schema_migrations (
@@ -57,5 +65,5 @@ run_file "0036_gate41_click_dedup" "$DB_DIR/migrations/0036_gate41_click_dedup.s
 run_file "seed_reference"        "$DB_DIR/seed/seed_reference.sql"
 
 echo "=== chain complete — verifying ledger ==="
-$PSQL -d "$DB_NAME" -c "SELECT step, filename FROM platform.schema_migrations ORDER BY applied_at;"
+psql_target -c "SELECT step, filename FROM platform.schema_migrations ORDER BY applied_at;"
 echo "=== OK: 0 errors ==="
