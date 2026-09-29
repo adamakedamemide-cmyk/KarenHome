@@ -81,7 +81,7 @@ export class AdvertisingService {
     const withinWindow = ageMs > 0 && ageMs < 10 * 60_000;
     const lowFraud = Number(impression.fraudScore) < 0.8;
     const isValid = withinWindow && lowFraud;
-    await this.ads.recordClick({
+    const click = await this.ads.recordClick({
       impressionId,
       ipHash: hash32(input.ip),
       userAgentHash: input.userAgent ? hash32(input.userAgent) : null,
@@ -91,6 +91,9 @@ export class AdvertisingService {
       rejectReason: isValid ? null : withinWindow ? 'stale_impression' : 'high_fraud_score',
     });
     if (!isValid) return { accepted: false, reason: withinWindow ? 'stale_impression' : 'high_fraud_score' };
+    // Gate 4.1 (Phase E/H fix): a second billed click on the same impression is
+    // stored auditable but NOT counted — no duplicate CPC accrual.
+    if (!click.counted) return { accepted: false, reason: 'duplicate_click' };
 
     const campaign = await this.ads.getCampaign(impression.campaignId);
     if (!campaign) return { accepted: true };

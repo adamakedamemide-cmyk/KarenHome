@@ -1,9 +1,13 @@
 import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { IsIn, IsNumberString, IsObject, IsOptional, IsString, IsUUID, Matches, MaxLength, MinLength } from 'class-validator';
 import type { FastifyRequest } from 'fastify';
+import type { AuthenticatedUser } from '@platform/contracts';
 import { AccessTokenGuard } from '../../../common/auth/access-token.guard';
+import { CurrentUser } from '../../../common/auth/current-user.decorator';
+import { PermissionsGuard } from '../../../common/auth/permissions.guard';
+import { RequirePermissions } from '../../../common/auth/permissions.decorator';
 import { AdvertisingService } from '../application/advertising.service';
-import { AdvertisingAdminService } from '../application/advertising-admin.service';
+import { AdvertisingAdminService, type AdminContext } from '../application/advertising-admin.service';
 
 export class ServeAdDto {
   @IsString() @MinLength(2) @MaxLength(64) slotCode!: string;
@@ -89,43 +93,55 @@ export class AdsController {
   }
 }
 
+/**
+ * Gate 4.1 (Phase E/H fix): the admin surface now requires the
+ * `advertising.manage` permission (resolved by the 0030 effective-permission
+ * engine for the x-organization-id scope) AND organization isolation is
+ * enforced in AdvertisingAdminService (platform.admin override allowed).
+ */
 @Controller('admin/ads')
-@UseGuards(AccessTokenGuard)
+@UseGuards(AccessTokenGuard, PermissionsGuard)
+@RequirePermissions('advertising.manage')
 export class AdvertisingAdminController {
   constructor(private readonly admin: AdvertisingAdminService) {}
 
+  private ctx(user: AuthenticatedUser, request: FastifyRequest): AdminContext {
+    const raw = request.headers['x-organization-id'];
+    return { actor: user, organizationId: typeof raw === 'string' ? raw : undefined };
+  }
+
   @Post('advertisers')
-  createAdvertiser(@Body() dto: CreateAdvertiserDto) {
-    return this.admin.createAdvertiser(dto).then((advertiser) => ({ data: advertiser }));
+  createAdvertiser(@Body() dto: CreateAdvertiserDto, @CurrentUser() user: AuthenticatedUser, @Req() request: FastifyRequest) {
+    return this.admin.createAdvertiser(this.ctx(user, request), dto).then((advertiser) => ({ data: advertiser }));
   }
 
   @Post('campaigns')
-  createCampaign(@Body() dto: CreateCampaignDto) {
-    return this.admin.createCampaign(dto).then((campaign) => ({ data: campaign }));
+  createCampaign(@Body() dto: CreateCampaignDto, @CurrentUser() user: AuthenticatedUser, @Req() request: FastifyRequest) {
+    return this.admin.createCampaign(this.ctx(user, request), dto).then((campaign) => ({ data: campaign }));
   }
 
   @Post('campaigns/:id/status')
-  setCampaignStatus(@Param('id') id: string, @Body() body: { status: 'DRAFT' | 'SCHEDULED' | 'ACTIVE' | 'PAUSED' | 'ENDED' | 'REJECTED' }) {
-    return this.admin.setCampaignStatus(id, body.status).then(() => ({ data: { id, status: body.status } }));
+  setCampaignStatus(@Param('id') id: string, @Body() body: { status: 'DRAFT' | 'SCHEDULED' | 'ACTIVE' | 'PAUSED' | 'ENDED' | 'REJECTED' }, @CurrentUser() user: AuthenticatedUser, @Req() request: FastifyRequest) {
+    return this.admin.setCampaignStatus(this.ctx(user, request), id, body.status).then(() => ({ data: { id, status: body.status } }));
   }
 
   @Post('campaigns/:id/creatives')
-  createCreative(@Param('id') id: string, @Body() dto: CreateCreativeDto) {
-    return this.admin.createCreative({ ...dto, campaignId: id }).then((creative) => ({ data: creative }));
+  createCreative(@Param('id') id: string, @Body() dto: CreateCreativeDto, @CurrentUser() user: AuthenticatedUser, @Req() request: FastifyRequest) {
+    return this.admin.createCreative(this.ctx(user, request), { ...dto, campaignId: id }).then((creative) => ({ data: creative }));
   }
 
   @Post('campaigns/:id/targets')
-  upsertTarget(@Param('id') id: string, @Body() dto: UpsertTargetDto) {
-    return this.admin.upsertTarget({ ...dto, campaignId: id }).then(() => ({ data: { accepted: true } }));
+  upsertTarget(@Param('id') id: string, @Body() dto: UpsertTargetDto, @CurrentUser() user: AuthenticatedUser, @Req() request: FastifyRequest) {
+    return this.admin.upsertTarget(this.ctx(user, request), { ...dto, campaignId: id }).then(() => ({ data: { accepted: true } }));
   }
 
   @Post('campaigns/:id/budgets')
-  createBudget(@Param('id') id: string, @Body() dto: CreateBudgetDto) {
-    return this.admin.createBudget({ ...dto, campaignId: id }).then((budget) => ({ data: budget }));
+  createBudget(@Param('id') id: string, @Body() dto: CreateBudgetDto, @CurrentUser() user: AuthenticatedUser, @Req() request: FastifyRequest) {
+    return this.admin.createBudget(this.ctx(user, request), { ...dto, campaignId: id }).then((budget) => ({ data: budget }));
   }
 
   @Get('campaigns/:id/report/:date')
-  report(@Param('id') id: string, @Param('date') date: string) {
-    return this.admin.report(id, date).then((report) => ({ data: report }));
+  report(@Param('id') id: string, @Param('date') date: string, @CurrentUser() user: AuthenticatedUser, @Req() request: FastifyRequest) {
+    return this.admin.report(this.ctx(user, request), id, date).then((r) => ({ data: r }));
   }
 }

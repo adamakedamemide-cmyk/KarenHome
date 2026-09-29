@@ -33,8 +33,18 @@ export class IamHardeningService {
     private readonly oauthRegistry: OAuthProviderRegistry,
     private readonly config: AppConfig,
   ) {
-    const key = this.config.mfaEncryptionKey;
-    this.cipher = new SecretCipher(key ?? 'development-only-mfa-encryption-key-0123456789abcdef0123456789');
+    // Gate 4.1 (Phase Q fix): the hard-coded development fallback key is REMOVED.
+    // - production without MFA_ENCRYPTION_KEY fails fast (no silent weak crypto)
+    // - non-production uses an ephemeral per-process random key (no constant secret
+    //   in source; TOTP secrets remain process-local and are never persisted across restarts)
+    const configuredKey = this.config.mfaEncryptionKey;
+    if (configuredKey) {
+      this.cipher = new SecretCipher(configuredKey);
+    } else if (this.config.nodeEnv === 'production') {
+      throw new Error('MFA_ENCRYPTION_KEY (>=43 chars) is required when NODE_ENV=production');
+    } else {
+      this.cipher = new SecretCipher(randomBytes(48).toString('base64'));
+    }
   }
 
   // --- Email verification -----------------------------------------------------

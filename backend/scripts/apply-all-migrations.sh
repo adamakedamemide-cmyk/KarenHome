@@ -6,7 +6,8 @@
 #   2. errata 0024 (provenance-tracked FIXED variant, W0-CF-02)
 #   3. errata 0025, 0026
 #   4. migrations 0027..0031 (Gate 3)
-#   5. seed_reference.sql
+#   5. migrations 0032..0036 (Gate 4 + Gate 4.1)
+#   6. seed_reference.sql
 # Every file is recorded in platform.schema_migrations (idempotency ledger).
 # ON_ERROR_STOP=1 → any error aborts with exit != 0 (0-ERROR requirement).
 # ============================================================================
@@ -51,6 +52,8 @@ run_file "0031_listing_state"    "$DB_DIR/migrations/0031_listing_state_reconcil
 run_file "0032_gate4_platform"   "$DB_DIR/migrations/0032_gate4_platform_infrastructure.sql"
 run_file "0033_gate4_iam"        "$DB_DIR/migrations/0033_gate4_iam_hardening.sql"
 run_file "0034_gate4_billing"    "$DB_DIR/migrations/0034_gate4_billing_plans.sql"
+run_file "0035_gate41_ads_authz" "$DB_DIR/migrations/0035_gate41_advertising_authorization.sql"
+run_file "0036_gate41_click_dedup" "$DB_DIR/migrations/0036_gate41_click_dedup.sql"
 run_file "seed_reference"        "$DB_DIR/seed/seed_reference.sql"
 
 echo "=== chain complete — verifying ledger ==="

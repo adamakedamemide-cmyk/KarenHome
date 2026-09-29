@@ -82,4 +82,30 @@ export class CommissionSettlementService {
     if (!calculation) throw new NotFoundException({ code: 'RESOURCE_NOT_FOUND', message: 'Calculation not found' });
     return calculation;
   }
+
+  /**
+   * Gate 4.1 (Phase G): explicit REVERSAL for a stored calculation.
+   * The original calculation stays immutable (DB triggers); the reversal is a
+   * separate adjustment record whose amount is derived from the stored
+   * calculation — callers cannot reverse more than was calculated.
+   */
+  async createReversal(input: { calculationId: string; reason: string; actorId: string }): Promise<{
+    id: string; calculationId: string; adjustmentType: 'REVERSAL'; amount: string; currencyCode: string;
+  }> {
+    const calc = await this.commission.getCalculation(input.calculationId);
+    if (!calc) throw new NotFoundException({ code: 'RESOURCE_NOT_FOUND', message: 'Calculation not found' });
+    if (calc.calcAmount === null) {
+      throw new NotFoundException({ code: 'VALIDATION_ERROR', message: 'Calculation has no amount to reverse' });
+    }
+    const amount = calc.calcAmount.startsWith('-') ? calc.calcAmount.slice(1) : `-${calc.calcAmount}`;
+    const id = await this.commission.createAdjustment({
+      calculationId: input.calculationId,
+      adjustmentType: 'REVERSAL',
+      amount,
+      currencyCode: calc.currencyCode,
+      reason: input.reason,
+      createdBy: input.actorId,
+    });
+    return { id, calculationId: input.calculationId, adjustmentType: 'REVERSAL', amount, currencyCode: calc.currencyCode };
+  }
 }

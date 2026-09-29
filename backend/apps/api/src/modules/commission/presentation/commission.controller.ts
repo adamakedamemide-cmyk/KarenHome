@@ -56,6 +56,10 @@ export class PayoutStatusDto {
   @IsIn(['REQUESTED', 'APPROVED', 'PAID', 'FAILED', 'CANCELLED']) status!: 'REQUESTED' | 'APPROVED' | 'PAID' | 'FAILED' | 'CANCELLED';
 }
 
+export class CreateReversalDto {
+  @IsString() @MinLength(3) @MaxLength(500) reason!: string;
+}
+
 @Controller('commission')
 @UseGuards(AccessTokenGuard)
 export class CommissionController {
@@ -112,5 +116,11 @@ export class CommissionController {
     await this.engine.requireCommissionPermission(user, 'commission.manage');
     await this.settlement.updatePayoutStatus(id, dto.status);
     return { data: { id, status: dto.status } };
+  }
+
+  @Post('calculations/:id/reversals')
+  async createReversal(@Param('id') id: string, @Body() dto: CreateReversalDto, @CurrentUser() user: AuthenticatedUser) {
+    await this.engine.requireCommissionPermission(user, 'commission.manage');
+    return { data: await this.settlement.createReversal({ calculationId: id, reason: dto.reason, actorId: user.id }) };
   }
 }

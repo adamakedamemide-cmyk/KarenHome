@@ -196,15 +196,34 @@ export class AdvertisingRepository {
     return { id: id2, counted: false };
   }
 
-  async recordClick(input: { impressionId: string; ipHash?: string | null; userAgentHash?: string | null; referer?: string | null; fraudScore: number; isValid: boolean; rejectReason?: string | null }): Promise<string> {
-    const r = await this.db.query<{ id: string }>(
+  /**
+   * Gate 4.1 (Phase E/H fix): record a click with per-impression billing dedup.
+   * The unique index uq_clicks_billed_per_impression (migration 0036) allows
+   * exactly ONE billed (is_valid=true) click per impression. On unique violation
+   * of a would-be-billed click, the click is re-recorded as is_valid=false with
+   * reject_reason='duplicate_click' — still auditable, never double-billed.
+   */
+  async recordClick(input: { impressionId: string; ipHash?: string | null; userAgentHash?: string | null; referer?: string | null; fraudScore: number; isValid: boolean; rejectReason?: string | null }): Promise<{ id: string; counted: boolean }> {
+    try {
+      const r = await this.db.query<{ id: string }>(
+        `INSERT INTO advertising.clicks(impression_id, ip_hash, user_agent_hash, referer, fraud_score, is_valid, reject_reason)
+         VALUES ($1::uuid, $2, $3, $4, $5::numeric, $6, $7) RETURNING id`,
+        [input.impressionId, input.ipHash ?? null, input.userAgentHash ?? null, input.referer ?? null, input.fraudScore, input.isValid, input.rejectReason ?? null],
+      );
+      const id = r.rows[0]?.id;
+      if (!id) throw new Error('CLICK_INSERT_FAILED');
+      return { id, counted: input.isValid };
+    } catch (error) {
+      if (!input.isValid || !isUniqueViolation(error)) throw error;
+    }
+    const r2 = await this.db.query<{ id: string }>(
       `INSERT INTO advertising.clicks(impression_id, ip_hash, user_agent_hash, referer, fraud_score, is_valid, reject_reason)
-       VALUES ($1::uuid, $2, $3, $4, $5::numeric, $6, $7) RETURNING id`,
-      [input.impressionId, input.ipHash ?? null, input.userAgentHash ?? null, input.referer ?? null, input.fraudScore, input.isValid, input.rejectReason ?? null],
+       VALUES ($1::uuid, $2, $3, $4, $5::numeric, false, 'duplicate_click') RETURNING id`,
+      [input.impressionId, input.ipHash ?? null, input.userAgentHash ?? null, input.referer ?? null, input.fraudScore],
     );
-    const id = r.rows[0]?.id;
-    if (!id) throw new Error('CLICK_INSERT_FAILED');
-    return id;
+    const id2 = r2.rows[0]?.id;
+    if (!id2) throw new Error('CLICK_INSERT_FAILED');
+    return { id: id2, counted: false };
   }
 
   async getImpression(impressionId: string, executor: QueryExecutor = this.db): Promise<{ id: string; campaignId: string; creativeId: string; servedAt: Date; isCounted: boolean; fraudScore: string } | null> {
@@ -265,5 +284,31 @@ export class AdvertisingRepository {
     );
     const row = r.rows[0];
     return row ? { id: row.id, pricingModel: row.pricing_model, priceAmount: row.price_amount, currencyCode: row.currency_code, status: row.status } : null;
+  }
+
+  /** Gate 4.1: resolve the owning organization of an advertiser (org isolation). */
+  async advertiserOrganization(advertiserId: string): Promise<{ organizationId: string } | null> {
+    const r = await this.db.query<{ organization_id: string }>(
+      `SELECT organization_id::text AS organization_id FROM advertising.advertisers WHERE id = $1::uuid`,
+      [advertiserId],
+    );
+    const row = r.rows[0];
+    return row ? { organizationId: row.organization_id } : null;
+  }
+
+  /**
+   * Gate 4.1 (Phase E/H): resolve the owning organization of a campaign for
+   * admin-side organization isolation. Used by AdvertisingAdminService.
+   */
+  async campaignOrganization(campaignId: string): Promise<{ organizationId: string; advertiserId: string } | null> {
+    const r = await this.db.query<{ organization_id: string; advertiser_id: string }>(
+      `SELECT a.organization_id::text AS organization_id, c.advertiser_id::text AS advertiser_id
+         FROM advertising.campaigns c
+         JOIN advertising.advertisers a ON a.id = c.advertiser_id
+        WHERE c.id = $1::uuid`,
+      [campaignId],
+    );
+    const row = r.rows[0];
+    return row ? { organizationId: row.organization_id, advertiserId: row.advertiser_id } : null;
   }
 }
