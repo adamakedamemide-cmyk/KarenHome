@@ -1,0 +1,15 @@
+{
+  "name": "enterprise-real-estate-platform",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "build": "pnpm --filter @platform/db build && pnpm --filter @platform/contracts build && pnpm --filter @platform/api build",
+    "typecheck": "pnpm --filter @platform/db typecheck && pnpm --filter @platform/contracts typecheck && pnpm --filter @platform/api typecheck",
+    "test": "pnpm --filter @platform/db test && pnpm --filter @platform/api test",
+    "test:integration": "pnpm --filter @platform/api test:integration",
+    "api:dev": "pnpm --filter @platform/api dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0"
+  }
+}

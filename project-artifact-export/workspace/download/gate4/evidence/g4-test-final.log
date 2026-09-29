@@ -1,0 +1,36 @@
+
+> enterprise-real-estate-platform@ test /home/z/my-project/w0-work/backend
+> pnpm --filter @platform/db test && pnpm --filter @platform/api test
+
+
+> @platform/db@1.0.0 test /home/z/my-project/w0-work/backend/packages/db
+> node --test
+
+ℹ tests 0
+ℹ suites 0
+ℹ pass 0
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15.609576
+
+> @platform/api@ test /home/z/my-project/w0-work/backend/apps/api
+> jest --runInBand
+
+PASS test/iam.service.spec.ts
+PASS test/g4-mfa-antibot.spec.ts
+PASS test/g4-i18n.spec.ts
+PASS src/common/auth/auth.spec.ts
+PASS test/g4-commission-engine.spec.ts
+PASS test/g4-publication-policy.spec.ts
+PASS test/listing-state.machine.spec.ts
+PASS test/g4-listing-state-machine.spec.ts
+PASS test/integration/db.integration.spec.ts
+PASS test/property.repository.contract.spec.ts
+
+Test Suites: 2 skipped, 10 passed, 10 of 12 total
+Tests:       20 skipped, 40 passed, 60 total
+Snapshots:   0 total
+Time:        4.375 s
+Ran all test suites.

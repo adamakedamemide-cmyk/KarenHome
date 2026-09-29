@@ -1,0 +1,50 @@
+CREATE TABLE
+CREATE FUNCTION
+DO
+DO
+              g3_test               | g3_result |                                                                detail                                                                
+------------------------------------+-----------+--------------------------------------------------------------------------------------------------------------------------------------
+ additive_states_transitions        | PASS      | 
+ ads_slots_seeded_11                | PASS      | slots=11
+ advertising_11_tables              | PASS      | tables=11
+ assignment_layer                   | PASS      | rows=1
+ budget_guard                       | PASS      | BUDGET_EXCEEDED: campaign 77891502-8a23-4f92-b768-75db67be33ed budget TOTAL exceeded
+ calc_immutable_update              | PASS      | IMMUTABLE_RECORD: calculations rows are snapshot-based and cannot be modified (OD-03/W0-E)
+ commission_7_tables                | PASS      | tables=7
+ commission_rules_empty             | PASS      | rules=0
+ derived_view_projection            | PASS      | 
+ effective_permissions_fn           | PASS      | 
+ enum_additive_states               | PASS      | draft,pending_moderation,published,paused,rejected,expired,sold,rented,archived,deleted,pending_verification,reserved,under_contract
+ enum_count_13                      | PASS      | count=13
+ fallback_other                     | PASS      | {ka,en}
+ fallback_ru                        | PASS      | {ru,en}
+ grants_table                       | PASS      | 
+ i18n_5_translation_tables          | PASS      | tables=5
+ invalid_locale_format_rejected     | PASS      | new row for relation "user_translations" violates check constraint "user_translations_locale_check"
+ is_listing_owner                   | PASS      | 
+ is_property_owner                  | PASS      | 
+ ledger_complete                    | PASS      | rows=13 (frozen 10 present; later gates append)
+ listing_assignments_table          | PASS      | 
+ no_invented_ad_pricing             | PASS      | priced=0
+ org_scope_role_resolution          | PASS      | rows=1
+ outbox_append_pending              | PASS      | 
+ permissions_seeded                 | PASS      | permissions=26
+ personal_scope_without_org         | PASS      | rows=1
+ publish_path_allowed               | PASS      | 
+ publish_requires_price_cover       | PASS      | LISTING_NOT_PUBLISHABLE: missing valid current price
+ role_permissions_mapped            | PASS      | mappings=83
+ rule_version_immutable_delete      | PASS      | IMMUTABLE_RECORD: rule_versions rows are snapshot-based and cannot be modified (OD-03/W0-E)
+ transition_illegal_rejected        | PASS      | Invalid listing status transition: published -> draft (canonical 12-state machine, OD-09)
+ transition_legal                   | PASS      | 
+ transition_matrix_seeded           | PASS      | rules=33
+ translation_cross_locale_slug_ok   | PASS      | 
+ translation_dup_locale_rejected    | PASS      | duplicate key value violates unique constraint "listing_translations_pkey"
+ translation_slug_unique_per_locale | PASS      | duplicate key value violates unique constraint "uq_listing_translations_slug"
+ version_bumped_on_update           | PASS      | version=4
+(37 rows)
+
+ failures | total 
+----------+-------
+        0 |    37
+(1 row)
+

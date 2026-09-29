@@ -1,0 +1,321 @@
+openapi: 3.1.0
+info:
+  title: Enterprise Real Estate Platform API
+  version: 1.0.0
+  description: Canonical application API for marketplace, property, organization, CRM, billing and trust domains.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      security: []
+      summary: Register a user
+      operationId: registerUser
+      responses:
+        '201': {description: Created}
+        '422': {$ref: '#/components/responses/ValidationError'}
+  /auth/login:
+    post:
+      security: []
+      summary: Create a session
+      operationId: login
+      responses:
+        '200': {description: Authenticated}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+  /auth/me:
+    get:
+      summary: Get current user
+      operationId: getCurrentUser
+      responses:
+        '200': {description: OK}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+  /properties:
+    post:
+      summary: Create a property
+      operationId: createProperty
+      responses:
+        '201': {description: Created}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    get:
+      security: []
+      summary: Search public properties
+      operationId: listProperties
+      responses:
+        '200': {description: OK}
+  /properties/{propertyId}:
+    parameters:
+      - {$ref: '#/components/parameters/propertyId'}
+    get:
+      security: []
+      summary: Get property
+      operationId: getProperty
+      responses:
+        '200': {description: OK}
+        '404': {$ref: '#/components/responses/NotFound'}
+    patch:
+      summary: Update a property
+      operationId: updateProperty
+      responses:
+        '200': {description: OK}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /listings:
+    post:
+      summary: Create a listing
+      operationId: createListing
+      responses:
+        '201': {description: Created}
+    get:
+      security: []
+      summary: List/search published listings
+      operationId: listListings
+      responses:
+        '200': {description: OK}
+  /listings/{listingId}:
+    parameters:
+      - {$ref: '#/components/parameters/listingId'}
+    get:
+      security: []
+      summary: Get listing
+      operationId: getListing
+      responses:
+        '200': {description: OK}
+        '404': {$ref: '#/components/responses/NotFound'}
+    patch:
+      summary: Update a listing
+      operationId: updateListing
+      responses:
+        '200': {description: OK}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /listings/{listingId}/publish:
+    post:
+      summary: Publish a listing
+      operationId: publishListing
+      responses:
+        '200': {description: Published}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '422': {$ref: '#/components/responses/ValidationError'}
+  /listings/{listingId}/archive:
+    post:
+      summary: Archive a listing
+      operationId: archiveListing
+      responses:
+        '204': {description: Archived}
+  /listings/{listingId}/price-history:
+    get:
+      security: []
+      summary: Get listing price history
+      operationId: getListingPriceHistory
+      responses:
+        '200': {description: OK}
+  /search/listings:
+    post:
+      security: []
+      summary: Search listings with structured filters
+      operationId: searchListings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SearchListingsRequest'}
+      responses:
+        '200': {description: OK}
+  /favorites/{listingId}:
+    parameters:
+      - {$ref: '#/components/parameters/listingId'}
+    put:
+      summary: Add listing to favorites
+      operationId: addFavorite
+      responses:
+        '204': {description: Added}
+    delete:
+      summary: Remove listing from favorites
+      operationId: removeFavorite
+      responses:
+        '204': {description: Removed}
+  /saved-searches:
+    get:
+      summary: List saved searches
+      operationId: listSavedSearches
+      responses:
+        '200': {description: OK}
+    post:
+      summary: Create a saved search
+      operationId: createSavedSearch
+      responses:
+        '201': {description: Created}
+  /organizations:
+    post:
+      summary: Create organization
+      operationId: createOrganization
+      responses:
+        '201': {description: Created}
+  /projects:
+    post:
+      summary: Create project
+      operationId: createProject
+      responses:
+        '201': {description: Created}
+  /leads:
+    post:
+      summary: Create lead
+      operationId: createLead
+      responses:
+        '201': {description: Created}
+  /viewings:
+    post:
+      summary: Schedule property viewing
+      operationId: scheduleViewing
+      responses:
+        '201': {description: Scheduled}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /orders:
+    post:
+      summary: Create an order
+      operationId: createOrder
+      responses:
+        '201': {description: Created}
+  /payments:
+    post:
+      summary: Initiate payment
+      operationId: initiatePayment
+      parameters:
+        - {$ref: '#/components/parameters/idempotencyKey'}
+      responses:
+        '201': {description: Created}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /payments/{paymentId}:
+    parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema: {type: string}
+    get:
+      summary: Get payment
+      operationId: getPayment
+      responses:
+        '200': {description: OK}
+  /contracts:
+    post:
+      summary: Create contract
+      operationId: createContract
+      responses:
+        '201': {description: Created}
+  /contracts/{contractId}/sign:
+    post:
+      summary: Sign contract
+      operationId: signContract
+      responses:
+        '200': {description: Signed}
+  /leases:
+    post:
+      summary: Create lease
+      operationId: createLease
+      responses:
+        '201': {description: Created}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /valuations:
+    post:
+      summary: Request valuation
+      operationId: requestValuation
+      responses:
+        '202': {description: Accepted}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    propertyId:
+      name: propertyId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    listingId:
+      name: listingId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    idempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: {type: string, minLength: 8, maxLength: 128}
+  schemas:
+    ApiError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, requestId]
+          properties:
+            code: {type: string}
+            message: {type: string}
+            requestId: {type: string}
+            details:
+              type: array
+              items: {type: object, additionalProperties: true}
+    SearchListingsRequest:
+      type: object
+      properties:
+        transactionTypes:
+          type: array
+          items: {type: string}
+        propertyTypeIds:
+          type: array
+          items: {type: string, format: uuid}
+        geoNodeIds:
+          type: array
+          items: {type: string, format: uuid}
+        minPrice: {type: string}
+        maxPrice: {type: string}
+        currency: {type: string, minLength: 3, maxLength: 3}
+        minAreaM2: {type: string}
+        maxAreaM2: {type: string}
+        minRooms: {type: integer, minimum: 0}
+        maxRooms: {type: integer, minimum: 0}
+        amenityCodes:
+          type: array
+          items: {type: string}
+        bbox:
+          type: object
+          required: [west, south, east, north]
+          properties:
+            west: {type: number}
+            south: {type: number}
+            east: {type: number}
+            north: {type: number}
+        sort:
+          type: string
+          enum: [relevance, newest, price_asc, price_desc, area_asc, area_desc]
+        limit: {type: integer, minimum: 1, maximum: 100, default: 24}
+        cursor: {type: string}
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiError'}
+    Forbidden:
+      description: Insufficient permission
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiError'}
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiError'}
+    Conflict:
+      description: State or uniqueness conflict
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiError'}
+    ValidationError:
+      description: Semantic validation failure
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiError'}

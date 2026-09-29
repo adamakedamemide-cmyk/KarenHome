@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: real_estate
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: REDACTED_SET_YOUR_OWN_LOCAL_PASSWORD
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d real_estate"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - real_estate_pg:/var/lib/postgresql/data
+
+volumes:
+  real_estate_pg:

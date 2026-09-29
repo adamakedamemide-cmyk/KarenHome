@@ -1,0 +1,8 @@
+         ->  Index Scan using ix_lsd_filters on listing_search_docs  (cost=0.15..8.18 rows=1 width=92) (actual time=0.007..0.007 rows=0 loops=1)
+               Rows Removed by Filter: 4
+ Planning Time: 0.522 ms
+ Execution Time: 0.049 ms
+ Planning Time: 1.691 ms
+ Execution Time: 0.147 ms
+ Planning Time: 0.572 ms
+ Execution Time: 0.068 ms

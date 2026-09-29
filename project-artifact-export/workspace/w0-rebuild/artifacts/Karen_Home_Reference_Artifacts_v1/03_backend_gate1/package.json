@@ -1,0 +1,15 @@
+{
+  "name": "enterprise-real-estate-platform",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "build": "npm run -w @platform/db build && npm run -w @platform/contracts build && npm run -w @platform/api build",
+    "typecheck": "npm run -w @platform/db typecheck && npm run -w @platform/contracts typecheck && npm run -w @platform/api typecheck",
+    "test": "npm run -w @platform/db test && npm run -w @platform/api test",
+    "api:dev": "npm run -w @platform/api dev"
+  },
+  "workspaces": ["apps/*", "packages/*"],
+  "devDependencies": {
+    "typescript": "^5.8.0"
+  }
+}

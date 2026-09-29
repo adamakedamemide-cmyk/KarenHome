@@ -1,0 +1,82 @@
+apps/
+├── api/
+│   └── src/
+│       ├── main.ts
+│       ├── app.module.ts
+│       ├── config/
+│       ├── common/
+│       │   ├── http/
+│       │   ├── auth/
+│       │   ├── errors/
+│       │   ├── pagination/
+│       │   ├── validation/
+│       │   └── observability/
+│       ├── modules/
+│       │   ├── identity/
+│       │   ├── authorization/
+│       │   ├── organizations/
+│       │   ├── geography/
+│       │   ├── properties/
+│       │   ├── listings/
+│       │   ├── search/
+│       │   ├── media/
+│       │   ├── favorites/
+│       │   ├── saved-searches/
+│       │   ├── agents/
+│       │   ├── projects/
+│       │   ├── crm/
+│       │   ├── messaging/
+│       │   ├── notifications/
+│       │   ├── billing/
+│       │   ├── verification/
+│       │   ├── moderation/
+│       │   ├── legal/
+│       │   ├── rental/
+│       │   ├── valuation/
+│       │   ├── reviews/
+│       │   ├── content/
+│       │   ├── seo/
+│       │   ├── analytics/
+│       │   ├── recommendations/
+│       │   └── admin/
+│       ├── infrastructure/
+│       │   ├── postgres/
+│       │   ├── redis/
+│       │   ├── opensearch/
+│       │   ├── object-storage/
+│       │   ├── messaging/
+│       │   ├── payments/
+│       │   ├── sms/
+│       │   ├── email/
+│       │   └── maps/
+│       └── events/
+│           ├── outbox/
+│           ├── consumers/
+│           └── publishers/
+└── worker/
+    └── src/
+        ├── jobs/
+        ├── consumers/
+        └── processors/
+
+Each domain module:
+module/
+├── presentation/
+│   ├── controllers/
+│   ├── dto/
+│   └── mappers/
+├── application/
+│   ├── commands/
+│   ├── queries/
+│   ├── handlers/
+│   └── services/
+├── domain/
+│   ├── entities/
+│   ├── value-objects/
+│   ├── policies/
+│   ├── events/
+│   └── repositories/
+└── infrastructure/
+    ├── persistence/
+    ├── providers/
+    └── projections/

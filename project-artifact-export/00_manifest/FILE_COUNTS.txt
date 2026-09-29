@@ -1,0 +1,20 @@
+FILE_COUNTS — Karen Home artifact export (2026-09-29)
+
+Files discovered (git-tracked in workspace)      = 819
+Files discovered (untracked/ignored, listed)     = node_modules/**, skills/**, .git/**, upload/ (empty), export output itself
+Files exported (in bundle, incl. 11 generated)   = 767
+  - original project files mirrored              = 756
+  - generated governance documents               = 11
+Files excluded (git-tracked, registered)         = 63
+Files excluded (untracked/ignored, registered)   = node_modules, skills/, .git/, upload/
+Files failed to export                           = 0
+
+Why the count differs from the UI panel figure of 57:
+The platform panel showed 57 items, but the real filesystem under download/ contains 70 files:
+  download/gate4/            = 33 (21 root + 12 evidence/)
+  download/w0/               = 34 (2 root + 8 evidence/ + 24 gate3/)
+  download/ root             =  3 (README.md, PROJECT_STATE_SUMMARY.md, karen-home-gate4-final.tar.gz)
+Panels can group or lag; per the user mandate the REAL file list was used (user rule §1), and ALL of them are exported.
+Also exported beyond download/: w0-work (319), reference inputs (364), root state files (3).
+
+Bundle: Karen_Home_Project_Artifacts_CURRENT_v1.zip (SHA-256 published in the delivery report; per-file integrity via SHA256SUMS above).

@@ -1,0 +1,7 @@
+PASS  C1 transition single-winner  — winners=1/10
+PASS  C2 job claim zero double-claim  — claimed=20/20 duplicates=0
+PASS  C3 budget guard  — accepted=5 rejected=5 spent=5.0000/5.0000
+PASS  C4 refresh rotation single-winner  — wins=1 reuse_detected=1
+PASS  C5 impression minute-dedup  — counted=1/10
+
+=== g4-concurrency: 5/5 PASS ===

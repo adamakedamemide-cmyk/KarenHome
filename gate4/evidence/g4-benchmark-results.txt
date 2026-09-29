@@ -1,0 +1,7 @@
+benchmark against http://127.0.0.1:3000, n=300 per scenario
+{"scenario":"simple_liveness","n":300,"mean":"0.4","p50":"0.3","p95":"1.0","p99":"2.0","errors":0,"badStatus":0}
+{"scenario":"search_fts","n":300,"mean":"0.5","p50":"0.2","p95":"1.2","p99":"3.9","errors":0,"badStatus":0}
+{"scenario":"authenticated_me","n":300,"mean":"0.8","p50":"0.2","p95":"1.7","p99":"5.8","errors":0,"badStatus":0}
+verdict simple: p95=1ms target=300ms → WITHIN_TARGET
+verdict search: p95=1.2ms target=500ms → WITHIN_TARGET
+verdict authed: p95=1.7ms target=400ms → WITHIN_TARGET

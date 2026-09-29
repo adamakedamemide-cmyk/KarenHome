@@ -1,0 +1,9 @@
+{
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "roots": ["<rootDir>/test"],
+  "moduleNameMapper": {
+    "^@platform/db$": "<rootDir>/../../packages/db/src",
+    "^@platform/contracts$": "<rootDir>/../../packages/contracts/src"
+  }
+}

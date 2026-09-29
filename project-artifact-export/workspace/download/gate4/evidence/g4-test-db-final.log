@@ -1,0 +1,18 @@
+PASS test/g4-e2e-redteam.spec.ts (5.267 s)
+PASS test/iam.service.spec.ts
+PASS test/integration/g4.integration.spec.ts
+PASS test/g4-mfa-antibot.spec.ts
+PASS src/common/auth/auth.spec.ts
+PASS test/g4-i18n.spec.ts
+PASS test/g4-commission-engine.spec.ts
+PASS test/listing-state.machine.spec.ts
+PASS test/integration/db.integration.spec.ts
+PASS test/g4-publication-policy.spec.ts
+PASS test/g4-listing-state-machine.spec.ts
+PASS test/property.repository.contract.spec.ts
+
+Test Suites: 12 passed, 12 total
+Tests:       60 passed, 60 total
+Snapshots:   0 total
+Time:        6.199 s
+Ran all test suites.

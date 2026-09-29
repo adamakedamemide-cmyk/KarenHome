@@ -1,0 +1,32 @@
+
+> enterprise-real-estate-platform@ test /home/z/my-project/w0-work/backend
+> pnpm --filter @platform/db test && pnpm --filter @platform/api test
+
+
+> @platform/db@1.0.0 test /home/z/my-project/w0-work/backend/packages/db
+> node --test
+
+ℹ tests 0
+ℹ suites 0
+ℹ pass 0
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14.852359
+
+> @platform/api@ test /home/z/my-project/w0-work/backend/apps/api
+> jest --runInBand
+
+PASS src/common/auth/auth.spec.ts
+PASS test/iam.service.spec.ts
+PASS test/listing-state.machine.spec.ts
+PASS test/integration/db.integration.spec.ts
+PASS test/property.repository.contract.spec.ts
+
+Test Suites: 5 passed, 5 total
+Tests:       9 passed, 9 total
+Snapshots:   0 total
+Time:        2.617 s, estimated 4 s
+Ran all test suites.
+TEST_EXIT=0

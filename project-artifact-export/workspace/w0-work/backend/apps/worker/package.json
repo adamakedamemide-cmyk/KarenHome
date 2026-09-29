@@ -1,0 +1,23 @@
+{
+  "name": "@platform/worker",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsc -p tsconfig.json && node dist/main.js",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@platform/contracts": "workspace:*",
+    "@platform/db": "workspace:*",
+    "pg": "^8.16.3",
+    "sharp": "^0.34.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.15.5",
+    "typescript": "^5.8.0"
+  }
+}

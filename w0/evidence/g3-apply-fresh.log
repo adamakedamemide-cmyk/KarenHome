@@ -1,0 +1,46 @@
+=== Karen Home — full migration chain on fresh DB: karen_g3_fresh ===
+── applying: base
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:8: NOTICE:  extension "postgis" already exists, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:11: NOTICE:  schema "platform" already exists, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:1740: NOTICE:  trigger "trg_property_status_requires_full_ownership" for relation "property.properties" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:1953: NOTICE:  trigger "trg_listing_status_history" for relation "marketplace.listings" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:1975: NOTICE:  trigger "trg_listing_publication_fields" for relation "marketplace.listings" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2003: NOTICE:  trigger "trg_apartment_details_type" for relation "property.apartment_details" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2006: NOTICE:  trigger "trg_house_details_type" for relation "property.house_details" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2009: NOTICE:  trigger "trg_land_details_type" for relation "property.land_details" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2012: NOTICE:  trigger "trg_commercial_details_type" for relation "property.commercial_details" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2015: NOTICE:  trigger "trg_hospitality_details_type" for relation "property.hospitality_details" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2033: NOTICE:  trigger "trg_listing_property_state" for relation "marketplace.listings" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2047: NOTICE:  constraint "user_phones_e164_format" of relation "user_phones" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2067: NOTICE:  trigger "trg_project_developer_org_type" for relation "project.projects" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2087: NOTICE:  trigger "trg_rent_schedule_currency" for relation "rental.rent_schedules" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2109: NOTICE:  trigger "trg_ledger_entry_currency" for relation "billing.ledger_entries" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql:2150: NOTICE:  trigger "trg_published_listing_requirements" for relation "marketplace.listings" does not exist, skipping
+── applying: errata_0024
+psql:/home/z/my-project/w0-work/backend/database/errata/0024_backend_critical_hardening_fixed.sql:62: NOTICE:  trigger "trg_listing_version" for relation "marketplace.listings" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/errata/0024_backend_critical_hardening_fixed.sql:142: NOTICE:  trigger "trg_listing_price_publication_integrity" for relation "marketplace.listing_prices" does not exist, skipping
+psql:/home/z/my-project/w0-work/backend/database/errata/0024_backend_critical_hardening_fixed.sql:148: NOTICE:  trigger "trg_listing_media_publication_integrity" for relation "marketplace.listing_media" does not exist, skipping
+── applying: errata_0025
+── applying: errata_0026
+── applying: 0027_commission
+── applying: 0028_advertising
+── applying: 0029_i18n
+── applying: 0030_iam_two_layer
+── applying: 0031_listing_state
+── applying: seed_reference
+=== chain complete — verifying ledger ===
+        step        |                  filename                   
+--------------------+---------------------------------------------
+ base               | enterprise_real_estate_schema_frozen_v1.sql
+ errata_0024        | 0024_backend_critical_hardening_fixed.sql
+ errata_0025        | 0025_additional_indexes.sql
+ errata_0026        | 0026_outbox_claiming.sql
+ 0027_commission    | 0027_commission_domain.sql
+ 0028_advertising   | 0028_advertising_domain.sql
+ 0029_i18n          | 0029_i18n_translations.sql
+ 0030_iam_two_layer | 0030_iam_personal_scope_authorization.sql
+ 0031_listing_state | 0031_listing_state_reconciliation.sql
+ seed_reference     | seed_reference.sql
+(10 rows)
+
+=== OK: 0 errors ===

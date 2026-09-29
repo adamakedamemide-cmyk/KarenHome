@@ -1,0 +1,20 @@
+
+> enterprise-real-estate-platform@ typecheck /home/z/my-project/w0-work/backend
+> pnpm --filter @platform/db typecheck && pnpm --filter @platform/contracts typecheck && pnpm --filter @platform/api typecheck && pnpm --filter @platform/worker typecheck
+
+
+> @platform/db@1.0.0 typecheck /home/z/my-project/w0-work/backend/packages/db
+> tsc -p tsconfig.json --noEmit
+
+
+> @platform/contracts@1.0.0 typecheck /home/z/my-project/w0-work/backend/packages/contracts
+> tsc -p tsconfig.json --noEmit
+
+
+> @platform/api@ typecheck /home/z/my-project/w0-work/backend/apps/api
+> tsc --noEmit
+
+
+> @platform/worker@1.0.0 typecheck /home/z/my-project/w0-work/backend/apps/worker
+> tsc -p tsconfig.json --noEmit
+

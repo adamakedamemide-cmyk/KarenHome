@@ -1,0 +1,5 @@
+PASS C1_budget_race — writer1=true, writer2_rejected=BUDGET_EXCEEDED: campaign b744971b-23b7-4795-bb67-82cf4b65aa57 budget TOTAL exceeded, spent=800
+PASS C2_outbox_claim — claimed A=5, B=5, overlap=0
+PASS C3_transition_race — winners=1 (exactly one)
+
+concurrency summary: 3/3 PASS

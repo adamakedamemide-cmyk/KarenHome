@@ -1,0 +1,30 @@
+# GIT_STATE — recorded at export time (2026-09-29)
+
+branch: main
+HEAD: dc2eb5cba56b885114515d1897aba4ab3c9f5cf5
+tags: gate3-db-final, gate4-final
+
+## git status --porcelain
+M download/PROJECT_STATE_SUMMARY.md
+ M worklog.md
+?? download/project-artifact-export/
+?? scripts/
+
+## git log -n 20
+dc2eb5c 2026-09-29 14:36:56 +0000 Z User
+  ebb315ac-1cdf-448f-b793-275f666d41e1
+73c9c0a 2026-09-29 14:36:10 +0000 Karen Gate Agent
+  GATE4: worklog
+9b020af 2026-09-29 14:35:39 +0000 Karen Gate Agent
+  GATE4: archive manifest + self-hash
+4fdb484 2026-09-29 14:35:29 +0000 Karen Gate Agent
+  GATE4: core backend, domains, workers, platform infra (0032-0034) — PARTIAL proceed-capable, 60/60 tests, 5/5 races, 37/37+22/22 SQL, REMOVED 0
+df45d69 2026-09-29 11:36:38 +0000 Z User
+  be4982ee-0743-4038-bd3d-3c6f2b3f48d5
+8d4eeef 2026-09-29 10:48:21 +0000 Z User
+  Initial commit
+
+## notes
+- .git/ directory intentionally NOT included in the bundle (contains tracked root .env in history; bulky).
+- Commit hash(es), tags and log above preserve the exact VCS state. No git remote is configured.
+- Root .env is tracked in git but contains no credential (reviewed).

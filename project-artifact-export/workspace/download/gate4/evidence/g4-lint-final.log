@@ -1,0 +1,4 @@
+
+> enterprise-real-estate-platform@ lint /home/z/my-project/w0-work/backend
+> eslint "packages/db/src/**/*.ts" "packages/contracts/src/**/*.ts" "apps/api/src/**/*.ts" "apps/api/test/**/*.ts" "apps/worker/src/**/*.ts"
+

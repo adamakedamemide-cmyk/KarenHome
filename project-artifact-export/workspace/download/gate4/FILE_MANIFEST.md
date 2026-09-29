@@ -1,0 +1,80 @@
+# FILE_MANIFEST — Gate 4
+
+Generated: 2026-09-29 (Tehran)
+Files hashed: 72
+
+Covers: gate4 reports + evidence + schema snapshot, database contract chain (base+errata+migrations+verify+seed), backend root configs/scripts, contracts and db sources.
+- `download/gate4/GATE4_ADVERTISING_REPORT.md` — `073d4ee3d1c5afd7…`
+- `download/gate4/GATE4_API_CONTRACT_REPORT.md` — `b4067d40d0b4e7d1…`
+- `download/gate4/GATE4_COMMISSION_REPORT.md` — `31c223c469394c94…`
+- `download/gate4/GATE4_DOMAIN_IMPLEMENTATION_REPORT.md` — `2a080ab4c8fbc5e0…`
+- `download/gate4/GATE4_EXECUTION_REPORT.md` — `f3428756e46a6f56…`
+- `download/gate4/GATE4_I18N_REPORT.md` — `d72a2aa47796ddc2…`
+- `download/gate4/GATE4_IAM_REPORT.md` — `f173ab93d72fe451…`
+- `download/gate4/GATE4_MEDIA_REPORT.md` — `67afc8c80f5093b3…`
+- `download/gate4/GATE4_NOTIFICATION_REPORT.md` — `ea4faa76979e9afe…`
+- `download/gate4/GATE4_PERFORMANCE_REPORT.md` — `91050de253f7d08b…`
+- `download/gate4/GATE4_RECOVERY_REPORT.md` — `9986e1e115cbf811…`
+- `download/gate4/GATE4_RED_TEAM_REPORT.md` — `9c2b1970da6f9318…`
+- `download/gate4/GATE4_SCHEMA_DRIFT_REPORT.md` — `c7c2f10d0661673e…`
+- `download/gate4/GATE4_SEARCH_REPORT.md` — `2e3173af3c16a2dd…`
+- `download/gate4/GATE4_SECURITY_REPORT.md` — `2b4c10fb75dcf36b…`
+- `download/gate4/GATE4_TEST_REPORT.md` — `7f4dc963568e80e5…`
+- `download/gate4/GATE4_WORKER_REPORT.md` — `5b830ea2b408c9b3…`
+- `download/gate4/evidence/g3-verification-on-g4-fresh.log` — `11735a331f144197…`
+- `download/gate4/evidence/g4-apply-fresh.log` — `63da25f01f6714a9…`
+- `download/gate4/evidence/g4-benchmark-results.txt` — `c4809aa42a374e7c…`
+- `download/gate4/evidence/g4-build-final.log` — `770b8f6ff2e8069f…`
+- `download/gate4/evidence/g4-concurrency.log` — `473e132c485d18c3…`
+- `download/gate4/evidence/g4-explain-analyze.txt` — `42b13d45ad88042c…`
+- `download/gate4/evidence/g4-lint-final.log` — `60c6d0de71021aa9…`
+- `download/gate4/evidence/g4-schema-diff.json` — `3562f282e313edf7…`
+- `download/gate4/evidence/g4-test-db-final.log` — `a5ce606b9fd955df…`
+- `download/gate4/evidence/g4-test-final.log` — `36b31f52d082f7ae…`
+- `download/gate4/evidence/g4-typecheck-final.log` — `a19f7635522c283e…`
+- `download/gate4/evidence/g4-verification.log` — `045fda029e846d50…`
+- `download/gate4/schema-snapshot-g4.sha256` — `2cd29e17a48a2bb2…`
+- `download/gate4/schema-snapshot-g4.sql` — `40bd5ee4ca9ff3e7…`
+- `w0-work/backend/RECOVERY.md` — `7dcffa6fb4260077…`
+- `w0-work/backend/database/base/enterprise_real_estate_schema_frozen_v1.sql` — `166dc3b013453881…`
+- `w0-work/backend/database/errata/0024_backend_critical_hardening.sql` — `f2de8d451475ecaf…`
+- `w0-work/backend/database/errata/0024_backend_critical_hardening_fixed.sql` — `99057633180f92fe…`
+- `w0-work/backend/database/errata/0025_additional_indexes.sql` — `9064790b6038d90f…`
+- `w0-work/backend/database/errata/0026_outbox_claiming.sql` — `1600280b3f639a76…`
+- `w0-work/backend/database/migrations/0027_commission_domain.sql` — `6715f2ad68503f64…`
+- `w0-work/backend/database/migrations/0028_advertising_domain.sql` — `e810ff4aa01ce9eb…`
+- `w0-work/backend/database/migrations/0029_i18n_translations.sql` — `2f5d510ad179c9a2…`
+- `w0-work/backend/database/migrations/0030_iam_personal_scope_authorization.sql` — `f7279511364b284b…`
+- `w0-work/backend/database/migrations/0031_listing_state_reconciliation.sql` — `e4499089560bbc7e…`
+- `w0-work/backend/database/migrations/0032_gate4_platform_infrastructure.sql` — `e2fae56f1cd4afa2…`
+- `w0-work/backend/database/migrations/0033_gate4_iam_hardening.sql` — `eb7eda693787b0d2…`
+- `w0-work/backend/database/migrations/0034_gate4_billing_plans.sql` — `209e35062f663d8a…`
+- `w0-work/backend/database/seed/seed_reference.sql` — `a07bf35ec298ff7f…`
+- `w0-work/backend/database/verify/critical-invariants.sql` — `0d8f44490f93385c…`
+- `w0-work/backend/database/verify/g3-verification.sql` — `b9d579c68e65ada2…`
+- `w0-work/backend/database/verify/g4-verification.sql` — `57452f3d28f2d71f…`
+- `w0-work/backend/eslint.config.mjs` — `281e299826d02229…`
+- `w0-work/backend/package.json` — `2c7e7ce1b1230a70…`
+- `w0-work/backend/packages/contracts/src/errors.ts` — `8d17e25d15b8cb79…`
+- `w0-work/backend/packages/contracts/src/index.ts` — `6b49e49ab8af8798…`
+- `w0-work/backend/packages/db/src/advertising-repository.ts` — `45d2e942f7e28dfa…`
+- `w0-work/backend/packages/db/src/audit-repository.ts` — `5835f05db305fbae…`
+- `w0-work/backend/packages/db/src/billing-repository.ts` — `9ed4a1736465ce4c…`
+- `w0-work/backend/packages/db/src/commission-repository.ts` — `bf23ecf3846c7a40…`
+- `w0-work/backend/packages/db/src/iam-hardening-repository.ts` — `94717cd74f123315…`
+- `w0-work/backend/packages/db/src/iam-repository.ts` — `25dd663778a38202…`
+- `w0-work/backend/packages/db/src/index.ts` — `70e5f7766b69fe67…`
+- `w0-work/backend/packages/db/src/job-repository.ts` — `2d63fa13d3d28969…`
+- `w0-work/backend/packages/db/src/listing-repository.ts` — `52129c61313e59f1…`
+- `w0-work/backend/packages/db/src/media-repository.ts` — `43917db6537c302b…`
+- `w0-work/backend/packages/db/src/notification-repository.ts` — `b0ce4df1828d97aa…`
+- `w0-work/backend/packages/db/src/outbox-repository.ts` — `e71e12304424b711…`
+- `w0-work/backend/packages/db/src/policy-repository.ts` — `56b2204e5c0c96b5…`
+- `w0-work/backend/packages/db/src/postgres-database.ts` — `e36494c4a81cadc9…`
+- `w0-work/backend/packages/db/src/property-repository.ts` — `9f34b32158e6a64f…`
+- `w0-work/backend/packages/db/src/search-repository.ts` — `fad597f87b0bfc98…`
+- `w0-work/backend/scripts/apply-all-migrations.sh` — `08afabb2ea769d6e…`
+- `w0-work/backend/scripts/g4-benchmark.js` — `acae39d00e2fbc4e…`
+- `w0-work/backend/scripts/g4-concurrency.js` — `70bfaf55abcbf905…`
+
+- `karen-home-gate4-final.tar.gz` — `de9cfe9a42bf1769e6bd249dc74330eecace192b8c45c59e346eb8d01520934c` (684K)

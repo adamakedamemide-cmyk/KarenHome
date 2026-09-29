@@ -1,0 +1,34 @@
+CREATE TABLE
+CREATE FUNCTION
+DO
+               g4_test               | g4_result | detail | g4_failure 
+-------------------------------------+-----------+--------+------------
+ G01_platform_infra_tables           | PASS      | 4/4    |          0
+ G02_media_pipeline_columns          | PASS      | 5/5    |          0
+ G03_iam_hardening_tables            | PASS      | 6/6    |          0
+ G04_billing_plan_tables             | PASS      | 4/4    |          0
+ G05_subscriptions_link_plan_version | PASS      |        |          0
+ G06_agreement_acceptances_table     | PASS      |        |          0
+ G07_notification_pref_tables        | PASS      | 2/2    |          0
+ G09_search_state_tables             | PASS      | 2/2    |          0
+ G10_fts_gin_index                   | PASS      |        |          0
+ G11_is_blocked_function             | PASS      |        |          0
+ G12_job_enqueue_pending             | PASS      |        |          0
+ G13_job_claim_running               | PASS      |        |          0
+ G14_job_requeue_dead                | PASS      |        |          0
+ G15_job_dedup_key                   | PASS      |        |          0
+ G16_block_active                    | PASS      |        |          0
+ G17_block_expiry                    | PASS      |        |          0
+ G18_fts_doc_matches                 | PASS      |        |          0
+ G19_plan_version_fk_guard           | PASS      |        |          0
+ G20_agreement_version_column        | PASS      |        |          0
+ G21_org_prefs_pk                    | PASS      |        |          0
+ G22_login_attempt_telemetry         | PASS      |        |          0
+ G23_media_phash_index               | PASS      |        |          0
+(22 rows)
+
+      g4_summary       
+-----------------------
+ G4-VERIFY: 22/22 PASS
+(1 row)
+

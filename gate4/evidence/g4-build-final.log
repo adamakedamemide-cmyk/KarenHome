@@ -1,0 +1,20 @@
+
+> enterprise-real-estate-platform@ build /home/z/my-project/w0-work/backend
+> pnpm --filter @platform/db build && pnpm --filter @platform/contracts build && pnpm --filter @platform/api build && pnpm --filter @platform/worker build
+
+
+> @platform/db@1.0.0 build /home/z/my-project/w0-work/backend/packages/db
+> tsc -p tsconfig.json
+
+
+> @platform/contracts@1.0.0 build /home/z/my-project/w0-work/backend/packages/contracts
+> tsc -p tsconfig.json
+
+
+> @platform/api@ build /home/z/my-project/w0-work/backend/apps/api
+> nest build
+
+
+> @platform/worker@1.0.0 build /home/z/my-project/w0-work/backend/apps/worker
+> tsc -p tsconfig.json
+
