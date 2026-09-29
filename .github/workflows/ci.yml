@@ -51,17 +51,19 @@ jobs:
       - name: Secret scan (pre-verify gate)
         run: bash scripts-ci/secret_scan.sh .
 
+      - name: Build
+        working-directory: backend
+        run: pnpm build
+
       - name: Lint
         working-directory: backend
         run: pnpm lint
 
+      # GATE5-S: typecheck resolves @platform/* via their built dist type
+      # declarations, so it MUST run after Build (CI has no prebuilt dist).
       - name: Typecheck
         working-directory: backend
         run: pnpm typecheck
-
-      - name: Build
-        working-directory: backend
-        run: pnpm build
 
       - name: Schema validation — apply full chain on fresh DB (15 steps)
         working-directory: backend
