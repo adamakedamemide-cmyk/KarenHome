@@ -40,6 +40,9 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          # GATE5-S fix: the lockfile lives in backend/, not the repo root —
+          # without this path setup-node fails before any step runs.
+          cache-dependency-path: backend/pnpm-lock.yaml
 
       - name: Install
         working-directory: backend
