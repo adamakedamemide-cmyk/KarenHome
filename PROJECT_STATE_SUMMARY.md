@@ -1,44 +1,51 @@
-# PROJECT_STATE_SUMMARY — Karen Home
-_Updated: 2026-09-29 (Asia/Tehran) — after Gate 4_
+# PROJECT_STATE_SUMMARY — Karen Home (updated by Gate 4.1)
 
-## Authoritative decision log (user-issued)
+Updated: 2026-09-29 · Authoritative repo: https://github.com/adamakedamide-cmyk/KarenHome.git (main) — see corrected URL below
 
-- Gate 0-R audit conclusions (CR-01..15) = authoritative. CR-05 = false positive (formal).
-- Historical build reports = Historical Evidence. **New Execution Evidence** is the validity standard.
-- **W0 Finalize + Gate 3-DB results registered as Reported Execution Evidence:** W0=PASS, Gate 3-DB=PASS, Fresh Apply=PASS, 37/37 invariants, 3/3 concurrency, Schema Diff REMOVED=0, snapshot SHA `f79a3348…`.
-- OD approvals: OD-01/02/03/04/08/09/13 APPROVED (see download/w0/W0_OPEN_DECISIONS.md). OD-03/OD-04 → zero invented business values (commission pricing, plan pricing) — enforced in Gate 4 code paths.
-- **Gate 4 mandate executed this session. Final status: PARTIAL (proceed-capable; no critical security/data-integrity issue).**
+## Current state
+- **Authoritative repository**: `https://github.com/adamakedamemide-cmyk/KarenHome.git` branch `main`
+- **Gate lineage**: W0 = PASS → Gate 3-DB = PASS → Gate 4 = PARTIAL (proceed-capable) → **Gate 4.1 = PASS** (integrity + closure + production-readiness audit; 4 real fixes shipped; CI active)
+- **Current HEAD**: see the Gate 4.1 delivery report (commit SHA printed with every push) · Tag: `gate4-1-final`
+- **Frozen historical snapshots**: export CURRENT v1 (`dc2eb5c` lineage, bundle SHA `ff42f446…`), Gate 4 archive `karen-home-gate4-final.tar.gz` (SHA `de9cfe9a…`)
+- **Raw pre-export git history**: intentionally NOT on GitHub (no-secrets rule); lineage preserved in `project-artifact-export/00_manifest/GIT_STATE.txt`
 
-## Current chain state
+## Environment (verified fresh in Gate 4.1)
+| Component | Version |
+|---|---|
+| Node | v24.21.0 |
+| pnpm | 10.15.0 |
+| PostgreSQL | 16.10 (conda) + PostGIS 3.5.0 |
+| Redis | 8.10.1 |
+| TypeScript | 5.8.x |
 
-| Gate | Scope | Status |
-|---|---|---|
-| Gate 0 / 0-R | Audit + reference bundle (SHA `af3a60e5…`) | PASS (accepted) |
-| W0 + Gate 3-DB | Build verification, ADRs, migrations 0027..0031, fresh apply, invariants | PASS (reported evidence) |
-| **Gate 4** | Core backend, domains, workers, platform infra (0032..0034) | **PARTIAL — complete report set in download/gate4/** |
+## Verification status (fresh, independent — Gate 4.1 evidence)
+| Check | Result |
+|---|---|
+| Fresh migration chain (base + errata + 0001..0036 + seed) | **15/15 steps, 0 ERROR** (`karen_g41_final`) |
+| critical-invariants | 6/6 true |
+| G3 SQL verification | 37/37 PASS |
+| G4 SQL verification | 22/22 PASS |
+| Jest (unit+integration+E2E+red-team+governance) | **64/64, 13/13 suites** |
+| Concurrency | G3 3/3 + G4 5/5 |
+| Typecheck / Lint / Build | 0 / 0 / 0 (4 packages) |
+| Schema diff vs Gate 4 baseline | REMOVED 0; ADDED = 0035/0036 objects only |
+| Benchmark p95 (simple/search/authenticated) | 1.3 / 1.1 / 2.6 ms (targets 300/500/400) |
+| Secret scan | 0 violations (every push) |
+| Schema snapshot g41 | 9494 lines, SHA-256 `bdcd5586217a6df678c45c3abed9ed05585eba19a3fc81d64b4cd5a5492627b4` |
 
-## Gate 4 headline numbers
+## Known UNVERIFIED (external) integrations
+OpenSearch live · SMTP live · Twilio live · FCM live · OAuth handshake live — all with complete adapters, defined failure modes, and regression-tested absence paths (see GATE4_1_EXTERNAL_INTEGRATION_STATUS).
 
-- Fresh apply **13/13 steps, 0 ERROR**; G3 invariants **37/37**; new G4 SQL suite **22/22**.
-- Schema diff vs Gate 3: **REMOVED 0**, ADDED 189 (all additive); snapshot SHA `40bd5ee4…`.
-- typecheck **0** / lint **0** / build **0** (4 packages) — logs in download/gate4/evidence/.
-- Tests: **60/60** (12 suites incl. integration+E2E+red-team) + concurrency **5/5**.
-- Performance p95: 1.0 / 1.2 / 1.7 ms vs targets 300/500/400 (sandbox-local caveat documented).
+## Known partial items
+ClamAV (signature-only) · S3 storage adapter (local-disk only) · worker Prometheus registry · OpenAPI decorator depth · dependency-audit remediation (18 transitive findings) · `canonical` i18n column approximation · full SAST · load-profile benchmarks. Details: `gate4_1/GATE4_1_OPEN_ISSUES.md`.
 
-## Key workspace paths
+## Known risks
+- GitHub Actions first cloud run pending (workflow configured + every step proven locally).
+- Raw git history absence on GitHub mitigated by frozen export + GIT_STATE.txt.
+- Domain absences (Messaging/CRM/Contracts/Projects/Valuation) are product-scope decisions — ADR-G41-01..05.
 
-- Codebase: `/home/z/my-project/w0-work/backend` (NestJS API + new `apps/worker` + packages db/contracts)
-- Gate 4 reports: `/home/z/my-project/download/gate4/` (17 GATE4_*.md + evidence/ + snapshot + manifests)
-- Previous gates: `/home/z/my-project/download/w0/` (+ gate3/)
-- Recovery: `w0-work/backend/RECOVERY.md`
+## Open decisions (user)
+ADR-G41-01..05 target gates · storage provider (S3/R2/MinIO) · CAPTCHA vendor · jurisdiction/e-signature for contracts.
 
-## Registered gaps (honest, §27) — candidates for next gate
-
-OpenSearch/SMTP/Twilio/FCM/OAuth-vendor live verification; ClamAV + S3 adapters; messaging service; CRM/Contracts/Projects/Valuation depth; worker-native metrics; full @ApiProperty OpenAPI annotations; CAPTCHA vendor.
-
-## Artifact Export (mandatory governance rule, user-issued 2026-09-29)
-
-- **Rule in force:** every task that creates/modifies files must end with a downloadable Artifact Bundle (manifest → SHA-256 → bundle → verify → deliver → then text summary). Bundle naming: `Karen_Home_Artifacts_<Gate>_R<n>.zip` (or `Karen_Home_Task_<ID>_Artifacts.zip`).
-- **Current snapshot bundle:** `Karen_Home_Project_Artifacts_CURRENT_v1.zip` — self-contained, contains all 756 project files (download/ 70, backend monorepo 319 incl. committed dist/, reference inputs 364, root state files 3) + 11 manifest/governance docs. File counts + SHA-256 registered in `project-artifact-export/00_manifest/` (PROJECT_ARTIFACT_EXPORT_MANIFEST.md/.csv, SHA256SUMS, FILE_COUNTS.txt).
-- Exclusions (63 tracked + caches) registered with reasons in EXPORT_EXCLUSIONS.md; secret redactions in SENSITIVE_DATA_REDACTIONS.md (docker-compose dev password redacted; no real credentials found in export).
-- Export task executed with **no new features and no next gate**, per explicit user instruction.
+## Frontend
+**FORBIDDEN until a new user mandate** — zero UI/mobile code exists in the repository (verified in Phase S).

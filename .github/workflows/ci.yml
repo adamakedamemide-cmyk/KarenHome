@@ -1,0 +1,90 @@
+name: CI
+
+# GATE 4.1 (Phase P) — minimum mandatory CI.
+# Install / Lint / Typecheck / Build / Unit+Integration Tests / Schema Validation /
+# OpenAPI Drift / Secret Scan. No branch or PR may merge on failure without an
+# explicit, audited override.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: ci-placeholder-password
+          POSTGRES_USER: karen
+          POSTGRES_DB: karen_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U karen"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://karen:ci-placeholder-password@127.0.0.1:5432/karen_ci
+      JWT_SECRET: ci-only-secret-0123456789abcdef0123456789abcdef0123456789
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        working-directory: backend
+        run: pnpm install --frozen-lockfile
+
+      - name: Secret scan (pre-verify gate)
+        run: bash scripts-ci/secret_scan.sh .
+
+      - name: Lint
+        working-directory: backend
+        run: pnpm lint
+
+      - name: Typecheck
+        working-directory: backend
+        run: pnpm typecheck
+
+      - name: Build
+        working-directory: backend
+        run: pnpm build
+
+      - name: Schema validation — apply full chain on fresh DB (15 steps)
+        working-directory: backend
+        run: |
+          psql "postgresql://karen:ci-placeholder-password@127.0.0.1:5432/karen_ci" -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+          bash scripts/apply-all-migrations.sh karen_ci
+
+      - name: SQL verification suites (invariants + G3 + G4)
+        working-directory: backend
+        run: |
+          for suite in critical-invariants g3-verification g4-verification; do
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "database/verify/$suite.sql"
+          done
+
+      - name: Tests (unit + integration + E2E + red-team + governance)
+        working-directory: backend
+        run: pnpm test
+        env:
+          RUN_DB_TESTS: '1'
+
+      - name: OpenAPI drift check
+        working-directory: backend
+        run: |
+          node apps/api/scripts-ci/dump-openapi.js /tmp/openapi-regen.json
+          diff -u apps/api/openapi.json /tmp/openapi-regen.json
+
+      - name: Dependency audit (report; hard-fail deferred — see GATE4_1_SECURITY_REPORT)
+        working-directory: backend
+        run: pnpm audit --prod || echo "::warning::audit findings registered in gate4_1/GATE4_1_SECURITY_REPORT.md"

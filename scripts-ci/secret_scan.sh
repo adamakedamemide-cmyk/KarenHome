@@ -28,7 +28,7 @@ PATTERNS=(
 FILES=$(git ls-files)
 for entry in "${PATTERNS[@]}"; do
   label="${entry%%:*}"; regex="${entry#*:}"
-  hits=$(git grep -nIE "$regex" -- $FILES 2>/dev/null | grep -vE "REDACTED|\.env\.example|SENSITIVE_DATA_REDACTIONS|secret_scan|GATE4_1_.*REPORT|PHASE_Q|<YOUR-OWN-PASSWORD>|<user>|<password>" | head -20)
+  hits=$(git grep -nIE "$regex" -- $FILES 2>/dev/null | grep -vE "REDACTED|\.env\.example|SENSITIVE_DATA_REDACTIONS|secret_scan|GATE4_1_.*REPORT|PHASE_Q|<YOUR-OWN-PASSWORD>|<user>|<password>|ci-placeholder-password" | head -20)
   if [ -n "$hits" ]; then
     echo "VIOLATION [$label]:"
     echo "$hits"

@@ -1,0 +1,36 @@
+HEAD: d5d292d3827fa353b40bf10175d48394ed75b01d
+branch: main
+
+git log --oneline -20:
+d5d292d GATE4.1 Phases E/G/H/L/Q: real fixes for registered gaps + governance test suite (4/4) + final full re-verification
+6a7c968 GATE4.1 Phase C correction: C5 chain-step formula fixed (seed_reference is the 13th step) — all 8 consistency checks now PASS
+3827abb GATE4.1 Phase B+C: file-by-file audit (1023 files, MD+CSV) + artifact consistency checks — PASS
+9665ed8 GATE4.1 Phase D: full independent re-verification — ALL GREEN, evidence logs committed
+229069d GATE4.1: add live backend/ as authoritative source + authoritative README + gitignores + secret-scan tooling
+4b51e98 GATE4.1 Phase A: repository recovery & full inventory evidence
+e27a546 PROJECT ARTIFACT EXPORT — Karen Home CURRENT v1 (self-contained audit snapshot)
+
+git status:
+ M PROJECT_STATE_SUMMARY.md
+?? .github/
+?? Karen_Home_Artifacts_Gate4_1_R1.zip
+?? RECOVERY.md
+?? backend/apps/api/openapi.json
+?? backend/apps/api/scripts-ci/
+?? backend/scripts-ci/
+?? gate4_1/ADR_G41_DEFERRALS.md
+?? gate4_1/GATE4_1_API_REPORT.md
+?? gate4_1/GATE4_1_CI_REPORT.md
+?? gate4_1/GATE4_1_DOMAIN_STATUS.md
+?? gate4_1/GATE4_1_EXECUTION_REPORT.md
+?? gate4_1/GATE4_1_EXTERNAL_INTEGRATION_STATUS.md
+?? gate4_1/GATE4_1_MEDIA_REPORT.md
+?? gate4_1/GATE4_1_NEXT_GATE.md
+?? gate4_1/GATE4_1_OPEN_ISSUES.md
+?? gate4_1/GATE4_1_PERFORMANCE_REPORT.md
+?? gate4_1/GATE4_1_RED_TEAM_REPORT.md
+?? gate4_1/GATE4_1_SEARCH_REPORT.md
+?? gate4_1/GATE4_1_SECURITY_REPORT.md
+?? gate4_1/GATE4_1_WORKER_REPORT.md
+?? gate4_1/GIT_STATE.txt
+
