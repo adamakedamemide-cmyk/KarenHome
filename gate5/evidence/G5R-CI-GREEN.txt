@@ -1,0 +1,11 @@
+GATE 5 — CI GREEN on real GitHub Actions (G5R-CI-001)
+Run: 36611033794 | HEAD: 0cc894242d86dc910d07b31e438c49e213d573c7 | conclusion: success
+Job verify: 2026-09-29T18:17:45Z → 18:19:34Z (~109s) on ubuntu-latest + postgis/postgis:16-3.4 service container
+All steps green: install(frozen lockfile) → secret-scan → build → lint → typecheck →
+schema apply 15/15 on fresh DB → SQL verification suites (invariants+G3+G4) →
+tests (unit+integration+e2e+red-team+governance) → OpenAPI drift → dependency audit.
+Root-caused fixes that made this possible (all committed during Gate 5):
+ 1) 222ea2c setup-node cache-dependency-path: backend/pnpm-lock.yaml
+ 2) ae18e16 Build before Typecheck (workspace types resolve via dist)
+ 3) ce3c920 migration runner honors DATABASE_URL (TCP-only env)
+ 4) 0cc8942 psql_target forwards -f/-c args (prior URL-path apply was a silent no-op)
