@@ -1,0 +1,5 @@
+G5R-PERF heavy run — authenticated /auth/me, C=500, N=2000 (valid JWT, DB-backed, G5R-PERF-001)
+{"level":500,"requests":2000,"ok":2000,"errors":0,"authzErrors":0,"rps":5376.3,"p50":62.99,"p95":190.16,"p99":190.99,"errorRate":0}
+RSS during run (KB): min 138476, max 141908 — stable, no growth across run.
+Second earlier run (401-path invalidated, discarded): replaced by this valid run.
+Cold start (NODE_ENV=production, fail-fast MFA key check active): 675ms to first OK /health/live.
