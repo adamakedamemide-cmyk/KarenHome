@@ -10,6 +10,7 @@ import { PropertiesModule } from './modules/properties/properties.module';
 import { ListingsModule } from './modules/listings/listings.module';
 import { MessagingModule } from './modules/messaging/messaging.module';
 import { CrmModule } from './modules/crm/crm.module';
+import { ProjectsModule } from './modules/projects/projects.module';
 import { SearchModule } from './modules/search/search.module';
 import { IamModule } from './modules/iam/iam.module';
 import { AuthorizationModule } from './modules/authorization/authorization.module';
@@ -34,7 +35,7 @@ import { AdminModule } from './modules/admin/admin.module';
     PropertiesModule,
     ListingsModule,
     MessagingModule,
-    CrmModule,
+    CrmModule, ProjectsModule,
     SearchModule,
     CommissionModule,
     BillingModule,
