@@ -158,3 +158,12 @@ is committed and pushed **first**, before Phase D resumes.
 - Legacy audit (directive §2): old fallback ABSENT; `.git-credentials`/`.netrc` ABSENT; remote URL clean (no embedded token); token-pattern scan 0 hits; live-value worktree scan 0 hits; worktree clean except this checkpoint's governance docs.
 - Working-tree recovery: 1113 sandbox mode-only flips (100644→100755, incl. 13 binary archives showing as content diff) restored to index modes → 0 dirty / 0 content delta; then gate doc registered untracked (no needless commit while credential absent).
 - This commit: `SECURITY_CREDENTIAL_GATE.md` finalized + this ledger row. Next per directive: Phase E / Audit 1 — Valuation schema discovery ONLY (no migration, no application code) until its own checkpoint.
+
+### Round 10 — Security ROTATION gate opened (directive: no rotation = no 0040)
+
+- Directive: classic PAT (over-privileged, chat-transit) not acceptable as final credential → mandatory rotation to fine-grained minimum-scope PAT stored ONLY in Z.ai persistent Secret Store; `.git/` storage FORBIDDEN for the new credential.
+- Runtime state: `GITHUB_TOKEN` env UNAVAILABLE (Secret Store binding absent); fine-grained PAT available NOWHERE; `.git/credentials/github_token` (classic) retained as INTERIM push capability ONLY — A3 ordering keeps it until new credential is proven, then removal.
+- Due diligence (evidence): `POST /user/fine_grained_tokens` → 404 (no self-service API); SDK/`z-ai` CLI sweep → no secrets mechanism in runtime; PAT self-revoke impossible via API ⇒ A1 creation, A2 binding, and classic revoke are OWNER EXTERNAL ACTIONS — registered in SECURITY_CREDENTIAL_GATE.md §3 with exact minimum-permission spec.
+- Interim classic dry-run: SUCCESS (Everything up-to-date) — labeled INTERIM, NOT permanent credential.
+- This commit: SECURITY_CREDENTIAL_GATE.md rewritten (rotation-blocked status + owner action list + post-binding execution order). NO Design Review, NO 0040, NO code — gate red.
+- Acceptance before 0040: GITHUB_TOKEN=AVAILABLE (fine-grained) · fetch 0 · LOCAL==REMOTE · dry-run SUCCESS · old .git token file ABSENT · embedded token ABSENT · secret scan CLEAN.

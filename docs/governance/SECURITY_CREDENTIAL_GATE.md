@@ -1,63 +1,53 @@
 # Security Credential Gate — Rotation Status
 
-Status: **GATE = GREEN** (2026-09-30) — write credential ACTIVE, chain verified, legacy material ABSENT.
-Directive chain: prior credential transited chat once ⇒ `COMPROMISED / DO NOT RETAIN` ⇒ full rotation ordered ⇒ sandbox rebuilt between sessions (old fallback lost with it) ⇒ new credential provisioned and gate chain re-executed.
+Status: **ROTATION IN PROGRESS — EXTERNALLY BLOCKED (owner actions pending)** · Interim credential ACTIVE for checkpoint pushes only · `0040 = NOT STARTED` until gate green (`NO SECURITY ROTATION = NO 0040`).
+Directive chain: classic PAT (over-privileged, chat-transit) ⇒ NOT acceptable as final credential ⇒ mandatory rotation to fine-grained minimum-scope PAT stored ONLY in the Z.ai persistent Secret Store.
 
 Per governance directive, this document records **no credential values, no fingerprints, and no reconstruction-enabling metadata**. Presence-only and result-only evidence.
 
-## 1) Gate verification evidence (results only)
-
-| Check (directive §1) | Result |
-|---|---|
-| `test -n "$GITHUB_TOKEN"` | `GITHUB_TOKEN=AVAILABLE` |
-| `git fetch origin` | exit 0 |
-| `git rev-parse HEAD` | `c60937be86f99109e9c46f2760ce31b72978f1e2` |
-| `git rev-parse origin/main` | `c60937be86f99109e9c46f2760ce31b72978f1e2` |
-| LOCAL HEAD == origin/main | **PROVEN** |
-| `git push --dry-run origin main` | **SUCCESS** — `Everything up-to-date`, exit 0 |
-| API identity (read-only) | login `adamakedamemide-cmyk` (repository owner), type `User` |
-
-## 2) Provisioning mechanism (durable, secret-blind)
-
-- Credential stored in ONE location: protected file **inside the repository `.git/` directory** (`mode 600`, directory `700`). Git can never track, commit, or push `.git/` internals; the platform workspace auto-repo tracks `karenhome` as a gitlink, so the file is invisible to it as well. Chosen after `/home/z/.secrets` (previous location, outside project) was destroyed by the sandbox rebuild while the repo `.git` survived intact.
-- Repo-local `credential.helper` = secure helper script (also inside `.git/`, mode 700): **env `GITHUB_TOKEN` preferred**, protected-file fallback. Config stores the helper **path only** — no plaintext token in `.git/config` (per prohibition list).
-- Recommendation (governance target state): bind `GITHUB_TOKEN` in the **Z.ai persistent Secret Store** to this project's runtime. The helper already prefers env, so binding is a drop-in upgrade; the protected file then serves purely as rebuild-recovery bootstrap.
-
-## 3) Minimum-permission finding — governance deviation REGISTERED
-
-The provisioned credential is a **classic PAT with scopes far beyond the required minimum** (observed via read-only API scope header — scope names only, recorded as non-sensitive audit finding):
-
-```text
-admin:enterprise, admin:gpg_key, admin:org_hook, admin:public_key,
-admin:ssh_signing_key, audit_log, codespace, copilot, delete:packages,
-delete_repo, gist, project, repo, workflow, write:network_configurations,
-write:packages
-```
-
-Required minimum (directive): **fine-grained PAT — repository `adamakedamemide-cmyk/KarenHome` only, Permissions = Contents: Read+Write** (Metadata auto-granted), nothing more.
-
-Additionally, the credential **transited chat once** at provisioning (owner-pasted).
-
-⇒ **ROTATION RE-FLAGGED (priority)**: replace with a fine-grained minimum-scope token at the next opportunity. The env-preferred helper makes replacement a zero-downtime drop-in (store new token, re-bind, delete old file, re-verify chain). Until replacement, the current token must be treated as a high-value asset: it is never printed, never written to any repo file, report, or ledger (verified by scan, §4).
-
-Old credential status: **absent from this environment entirely** (file destroyed by rebuild; no copy existed anywhere else per audit). Owner-side revocation on GitHub cannot be verified from here (no value retained to test against) — owner should confirm revocation in GitHub → Settings → Developer settings.
-
-## 4) Legacy credential audit + secret scan (directive §2)
+## 1) Current runtime state (2026-09-30, rotation session)
 
 | Check | Result |
 |---|---|
-| Old filesystem fallback `/home/z/.secrets/github_token` | **ABSENT** (directory empty) |
-| `OLD TOKEN = NOT AVAILABLE` | ✓ — no copy exists anywhere in the runtime |
-| Embedded token in remote URL | **ABSENT** — `https://github.com/adamakedamemide-cmyk/KarenHome.git` (clean) |
-| `.git-credentials` | **ABSENT** |
-| `.netrc` | **ABSENT** |
-| `credential.helper` config | path-only reference to in-`.git` helper (no token material) |
-| Token-pattern scan (ghp_/github_pat_/gho_/ghs_/ghr_) over working tree | **0 hits** |
-| Live-value scan of entire worktree (excluding `.git/`) | **0 hits** |
-| `.env` files in backend runtime | none in repo root of backend (only historical `.env.example` templates in reference archives) |
+| `GITHUB_TOKEN` env (Secret Store binding) | **UNAVAILABLE** — binding not yet present in this runtime |
+| Fine-grained PAT available anywhere | **NO** |
+| `.git/credentials/github_token` | EXISTS — format **classic** (INTERIM ONLY, kept per A3 ordering: removal happens AFTER new credential is proven) |
+| Credential helper | env-preferred / protected-file fallback (path-only config) — will automatically prefer the bound Secret Store token once it appears |
+| Interim classic dry-run push | SUCCESS — explicitly labeled **INTERIM, NOT the permanent credential** |
 
-## 5) Authorization to proceed
+## 2) Due diligence — why the rotation is externally blocked
 
-- **SECURITY GATE = GREEN** per directive criteria (§1 all green).
-- Phase E / **Audit 1** (Schema Discovery) may start: repository inspection only — **NO migration, NO application code, NO frontend** until the audit document is committed, pushed, and proven (`LOCAL HEAD == origin/main`).
-- Design verdict + canonical-entity mapping to be produced in `docs/governance/gate5_1/PHASE_E_VALUATION_SCHEMA_AUDIT.md`.
+| Capability | Probe | Verdict |
+|---|---|---|
+| Create fine-grained PAT via API | `POST /user/fine_grained_tokens` → **404** | GitHub provides NO self-service API for fine-grained PAT creation (UI-only) |
+| Z.ai Secret Store write access from runtime | SDK + `z-ai` CLI sweep | No secrets subcommand / API — the Secret Store is owner-side project settings; binding injects `GITHUB_TOKEN` into sandbox runtimes |
+| Classic PAT self-revoke via API | Not possible for PATs | Owner-side action |
+
+## 3) Required OWNER actions (exact, per directive A1–A3)
+
+1. **A1 — Create fine-grained PAT** (GitHub → Settings → Developer settings → Fine-grained tokens):
+   ```text
+   Repository access = ONLY adamakedamemide-cmyk/KarenHome
+   Permissions       = Contents: Read and Write (+ Metadata: read, auto)
+   MUST NOT include  = workflow / administration / delete_repo / enterprise / org hooks / any other scope
+   ```
+2. **A2 — Bind in Z.ai persistent Secret Store**: project settings → Secrets → name `GITHUB_TOKEN`, value = new fine-grained token, bound to this project's runtime. NEVER via chat, `.git/`, `.env`, source code, repository, reports, artifacts, PUSH_LEDGER.
+3. **Revoke the classic PAT** (same Developer settings page) — external action; runtime cannot perform it. It must be registered as done by owner; classic must not remain the project's permanent credential.
+
+## 4) Runtime execution immediately after binding (next session, in order)
+
+1. `GITHUB_TOKEN=AVAILABLE` presence check + format check (expect `github_pat_…`, fine-grained).
+2. API permission proof (read-only): repo `permissions.push = true`, no legacy scopes header.
+3. `git fetch origin` → `rev-parse HEAD` vs `origin/main` → `git push --dry-run origin main`.
+4. **A3 removal**: delete `.git/credentials/github_token` + credentials dir; helper becomes env-only (Secret Store-bound); verify NO embedded credential in remote URL.
+5. Full re-verification + secret scan (0 hits) — acceptance:
+   ```text
+   GITHUB_TOKEN = AVAILABLE        Embedded Token = ABSENT
+   Old .git token file = ABSENT    Secret Scan = CLEAN
+   LOCAL HEAD == origin/main       DRY-RUN = SUCCESS
+   ```
+6. Only then: Design Review (B) → 0040 (C/D) → tests (E) per directive. Until then `0040 = NOT STARTED`.
+
+## 5) Interim state register (honest, temporary)
+
+- The classic PAT remains the **interim push capability** for governance checkpoint pushes ONLY (ledger/documentation), explicitly registered as **NOT the permanent credential**, to be revoked by owner and removed from the environment after the fine-grained credential is proven. This is the only state that satisfies both `NO PUSH = NO COMPLETED ACTION` and the A3 ordering (remove old only after new is proven).
