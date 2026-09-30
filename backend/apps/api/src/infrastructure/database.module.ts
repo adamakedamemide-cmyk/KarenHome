@@ -1,6 +1,6 @@
 import { Global, Module, OnApplicationShutdown } from '@nestjs/common';
 import {
-  PostgresDatabase, IamRepository, IamHardeningRepository, PropertyRepository, ListingRepository, OutboxRepository,
+  PostgresDatabase, IamRepository, IamHardeningRepository, PropertyRepository, ListingRepository, MessagingRepository, OutboxRepository,
   AuditRepository, JobRepository, CommissionRepository, BillingRepository, AdvertisingRepository,
   NotificationRepository, MediaRepository, SearchIndexRepository, PublicationPolicyRepository, AntiBotRepository,
 } from '@platform/db';
@@ -23,6 +23,7 @@ import { AppConfig } from '../common/config/app-config';
     { provide: IamHardeningRepository, inject: [PostgresDatabase], useFactory: (db: PostgresDatabase) => new IamHardeningRepository(db) },
     { provide: PropertyRepository, inject: [PostgresDatabase], useFactory: (db: PostgresDatabase) => new PropertyRepository(db) },
     { provide: ListingRepository, inject: [PostgresDatabase], useFactory: (db: PostgresDatabase) => new ListingRepository(db) },
+    { provide: MessagingRepository, inject: [PostgresDatabase], useFactory: (db: PostgresDatabase) => new MessagingRepository(db) },
     { provide: OutboxRepository, inject: [PostgresDatabase], useFactory: (db: PostgresDatabase) => new OutboxRepository(db) },
     { provide: AuditRepository, inject: [PostgresDatabase], useFactory: (db: PostgresDatabase) => new AuditRepository(db) },
     { provide: JobRepository, inject: [PostgresDatabase], useFactory: (db: PostgresDatabase) => new JobRepository(db) },
@@ -36,7 +37,7 @@ import { AppConfig } from '../common/config/app-config';
     { provide: AntiBotRepository, inject: [PostgresDatabase], useFactory: (db: PostgresDatabase) => new AntiBotRepository(db) },
   ],
   exports: [
-    AppConfig, PostgresDatabase, IamRepository, IamHardeningRepository, PropertyRepository, ListingRepository, OutboxRepository,
+    AppConfig, PostgresDatabase, IamRepository, IamHardeningRepository, PropertyRepository, ListingRepository, MessagingRepository, OutboxRepository,
     AuditRepository, JobRepository, CommissionRepository, BillingRepository, AdvertisingRepository,
     NotificationRepository, MediaRepository, SearchIndexRepository, PublicationPolicyRepository, AntiBotRepository,
   ],

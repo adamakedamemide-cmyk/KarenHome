@@ -3,6 +3,7 @@ export * from './iam-repository';
 export * from './iam-hardening-repository';
 export * from './property-repository';
 export * from './listing-repository';
+export * from './messaging-repository';
 export * from './outbox-repository';
 export * from './audit-repository';
 export * from './job-repository';
