@@ -25,6 +25,7 @@ function makeRepo(overrides: Record<string, LooseMock> = {}) {
     updateLeadStatus: mockFn(async () => ({ ...leadRow, status: 'contacted' })),
     appendActivity: mockFn(async () => ({ id: 'act-1', lead_id: 'lead-1', activity_type: 'note', performed_by: 'u1', subject: null, body: null, metadata: {}, occurred_at: now })),
     listActivities: mockFn(async () => []),
+    hasActivityByActor: mockFn(async () => false),
     listLeadViewings: mockFn(async () => []),
     getTask: mockFn(async () => null),
     createTask: mockFn(async () => ({ id: 'task-1', title: 'T', status: 'open', due_at: null, organization_id: 'org-1', lead_id: 'lead-1' })),
