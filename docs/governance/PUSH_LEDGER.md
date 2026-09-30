@@ -136,3 +136,9 @@ is committed and pushed **first**, before Phase D resumes.
 - PUSH: `git push origin main` → `9995439..1558ee0` SUCCESS. Proof: LOCAL HEAD = REMOTE main = `1558ee0b4db289acc47381e8298fe7d51b399a2a`.
 - Pushed set: 5 frozen commits (preserved, no rewrite) + 1 pre-push fix commit.
 - Post-push: governance docs (this file + ENVIRONMENT_VARIANCE.md) committed+pushed; then 1105 mode-only changes to be restored (index = authored intent, all mode flips are sandbox fs artifacts, 0 content delta).
+
+### Round 7 — Governance docs pushed; mode cleanup; Phase D milestone
+
+- Governance docs pushed: `1558ee0..e70c021` — LOCAL == REMOTE = `e70c021d4bb60bcdacc76c2531b0a61f301e0f10` (proven).
+- Mode-only cleanup: all 1104 remaining mode flips restored from index (0 content delta anywhere) → working tree clean except Phase D draft.
+- PHASE D STARTED (Projects): migration `0039_gate51_projects_domain.sql` committed and applied to real PG (17.11+PostGIS 3.5.2) via idempotent runner (ledger rows 18, applied=1 skipped=17). Live trigger evidence: PROJECT_UNKNOWN_STATUS rejected, PROJECT_INVALID_TRANSITION (planned→completed) rejected, valid planned→pre_sale accepted (touch trigger sets updated_at=now(); within-tx equality noted — now() is tx-stable, not a defect), permission seeds project.view/project.manage present. Tests executed in rolled-back transactions — no data residue.
