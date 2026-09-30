@@ -167,3 +167,13 @@ is committed and pushed **first**, before Phase D resumes.
 - Interim classic dry-run: SUCCESS (Everything up-to-date) — labeled INTERIM, NOT permanent credential.
 - This commit: SECURITY_CREDENTIAL_GATE.md rewritten (rotation-blocked status + owner action list + post-binding execution order). NO Design Review, NO 0040, NO code — gate red.
 - Acceptance before 0040: GITHUB_TOKEN=AVAILABLE (fine-grained) · fetch 0 · LOCAL==REMOTE · dry-run SUCCESS · old .git token file ABSENT · embedded token ABSENT · secret scan CLEAN.
+
+### Round 11 — Rotation verification: fine-grained credential PROVEN; 2 RED items keep the gate closed
+
+- Owner provisioned the fine-grained PAT via chat (4th transit — RE-FLAGGED); Secret Store binding did NOT inject into the runtime (env / pid1 / profiles / CLI probed — UNAVAILABLE at session start). Token held in SESSION env only; never written to disk, repo, or ledger.
+- Proven env-only (classic quarantined during test): format fine-grained (`github_pat_`, length 93); API identity = owner (`adamakedamemide-cmyk`); scope probe = EXACTLY 1 accessible repo (KarenHome); `git fetch` exit 0; `push --dry-run` SUCCESS.
+- A3 executed AFTER proof: `.git/credentials/github_token` SHREDDED (file + directory ABSENT); credential helper rewritten env-ONLY (file fallback removed); remote URL clean; `.git/config` carries helper path only.
+- RED-1: classic PAT still VALID (API probe returned 200) — owner-side revoke pending.
+- RED-2: Secret Store binding undetected — owner must bind `GITHUB_TOKEN` (current PAT acceptable; fresh no-chat PAT preferred).
+- Real push (this commit) executed with the fine-grained token env-only → Contents R+W proven; LOCAL==REMOTE proven post-push; secret scan CLEAN (HEAD 0 hits; history hits = benign scanner-regex/doc literals).
+- Verdict per directive: SECURITY ROTATION = RED · 0040 = NOT STARTED · DESIGN REVIEW = NOT STARTED · DEVELOPMENT = NONE.
