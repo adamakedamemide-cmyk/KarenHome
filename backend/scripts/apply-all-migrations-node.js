@@ -28,6 +28,7 @@ const STEPS = [
   ['0037_gate51_messaging', 'migrations/0037_gate51_messaging_domain.sql'],
   ['0038_gate51_crm', 'migrations/0038_gate51_crm_domain.sql'],
   ['0039_gate51_projects', 'migrations/0039_gate51_projects_domain.sql'],
+  ['0040_gate51_valuation', 'migrations/0040_gate51_valuation_domain.sql'],
   ['seed_reference', 'seed/seed_reference.sql'],
 ];
 
